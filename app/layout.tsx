@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import Script from "next/script";
 import JsonLd from "@/components/JsonLd";
 import { ADSENSE_CLIENT, SITE_URL } from "@/lib/site";
@@ -37,9 +38,11 @@ export const viewport: Viewport = {
   themeColor: "#f9f8f4",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Set by middleware from the /ko and /ja path prefixes.
+  const lang = (await headers()).get("x-lang") ?? "en";
   return (
-    <html lang="en">
+    <html lang={lang}>
       <body>
         {/* Secure Privacy consent banner — loads first so it can gate cookies/trackers for EU visitors */}
         <Script

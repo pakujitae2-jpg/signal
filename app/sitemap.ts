@@ -35,16 +35,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "hourly" as const,
       priority: 0.9,
     })),
-    ...CURRENCY_CODES.map((code) => ({
-      url: `${SITE_URL}/convert/${code.toLowerCase()}`,
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    })),
-    ...FX_SLUGS.map((slug) => ({
-      url: `${SITE_URL}/convert/${slug}`,
-      changeFrequency: "hourly" as const,
-      priority: /^\d/.test(slug) ? 0.6 : 0.8,
-    })),
+    // Currency pages exist in English, Korean and Japanese.
+    ...["", "/ko", "/ja"].flatMap((p) => [
+      ...(p ? [{ url: `${SITE_URL}${p}/convert`, changeFrequency: "weekly" as const, priority: 0.8 }] : []),
+      ...CURRENCY_CODES.map((code) => ({
+        url: `${SITE_URL}${p}/convert/${code.toLowerCase()}`,
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      })),
+      ...FX_SLUGS.map((slug) => ({
+        url: `${SITE_URL}${p}/convert/${slug}`,
+        changeFrequency: "hourly" as const,
+        priority: /^\d/.test(slug) ? 0.6 : 0.8,
+      })),
+    ]),
     ...POPULAR_SYMBOLS.map((symbol) => ({
       url: `${SITE_URL}/quote/${encodeURIComponent(symbol)}`,
       changeFrequency: "hourly" as const,
