@@ -18,3 +18,7 @@ npm-debug.log*
 
 # vercel
 .vercel
+
+# cloudflare
+/.open-next/
+/.wrangler/

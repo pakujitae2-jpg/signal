@@ -18,15 +18,24 @@ npm run build      # 프로덕션 빌드
 npm start          # 프로덕션 서버
 ```
 
-## 배포 (Vercel)
+## 배포 (Cloudflare Workers — 기본)
 
-1. [vercel.com/new](https://vercel.com/new) 접속 → **Import Git Repository**에서 이 저장소(`signal`) 선택
-2. 설정 변경 없이 **Deploy** 클릭 — 끝. (Next.js 자동 인식)
-3. 이후 이 저장소에 푸시할 때마다 자동 재배포됩니다.
+[@opennextjs/cloudflare](https://opennext.js.org/cloudflare) 어댑터가 설정되어 있습니다 (`wrangler.jsonc`, `open-next.config.ts`).
 
-`/api/market` 응답에 CDN 캐시 헤더(`s-maxage=15, stale-while-revalidate=60`)가 붙어 있어, 트래픽이 몰려도 업스트림 호출은 최소화되고 사용자는 CDN에서 즉시 응답을 받습니다.
+**Git 연동 (권장 — 푸시할 때마다 자동 배포):**
+1. Cloudflare 대시보드 → **Workers & Pages** → **Create** → **Workers** 탭 → **Import a repository**
+2. GitHub 연결 후 이 저장소(`signal`) 선택
+3. 빌드 명령: `npx opennextjs-cloudflare build` / 배포 명령: `npx opennextjs-cloudflare deploy` (wrangler.jsonc 자동 인식)
+4. 배포되면 `signal.<계정>.workers.dev` 주소가 생기고, Worker → Settings → **Domains & Routes**에서 커스텀 도메인을 연결합니다 (도메인 DNS가 Cloudflare에 있으면 원클릭)
+5. 빌드 환경변수에 `NEXT_PUBLIC_SITE_URL=https://도메인` 추가 (캐노니컬·사이트맵 기준 주소)
 
-> 참고: 이 개발 샌드박스는 외부 금융 API가 차단되어 샘플 데이터가 표시됩니다. Vercel에 배포하면 실시간 데이터로 자동 전환됩니다.
+**CLI 배포:** `npx wrangler login` 후 `npm run deploy`. 로컬에서 Workers 런타임으로 미리보기는 `npm run preview`.
+
+> 참고: 이 개발 샌드박스는 외부 금융 API가 차단되어 샘플 데이터가 표시됩니다. 실서버에 배포하면 실시간 데이터로 자동 전환됩니다.
+
+### 대안: Vercel
+
+저장소를 [vercel.com/new](https://vercel.com/new)에서 import하면 설정 없이 그대로 배포됩니다. (Cloudflare 설정 파일은 Vercel에서 무시되므로 공존 가능)
 
 ## 데이터 소스
 
