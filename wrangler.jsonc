@@ -7,7 +7,11 @@
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "directory": ".open-next/assets",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
+    // Serve .html assets at their exact URL. The default strips the extension
+    // with a 307, which breaks search-engine verification files that must
+    // answer 200 at the URL the verifier was given.
+    "html_handling": "none"
   },
   "observability": {
     "enabled": true
