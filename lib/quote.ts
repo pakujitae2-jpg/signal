@@ -1,3 +1,4 @@
+import { fetchJson } from "./http";
 import { SYMBOLS } from "./symbols";
 import { SAMPLE_CRYPTO, SAMPLE_QUOTES } from "./sample-data";
 
@@ -28,8 +29,6 @@ export type QuoteDetail = {
   source: "live" | "sample";
 };
 
-const FETCH_TIMEOUT_MS = 8_000;
-const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
 const CACHE_TTL_MS = 30_000;
 const cache = new Map<string, { data: QuoteDetail; ts: number }>();
 
@@ -74,13 +73,7 @@ export async function getQuoteDetail(symbol: string, range: Range): Promise<Quot
 
   try {
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${RANGE_INTERVAL[range]}`;
-    const res = await fetch(url, {
-      headers: { "User-Agent": UA, Accept: "application/json" },
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      cache: "no-store",
-    });
-    if (!res.ok) throw new Error(`${res.status}`);
-    const json = await res.json();
+    const json = await fetchJson(url);
     const r = json?.chart?.result?.[0];
     if (!r) throw new Error("no result");
 

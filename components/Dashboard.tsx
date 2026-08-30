@@ -301,7 +301,10 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
               <p className="statline">
                 Total market cap <b>{fmtCompactUsd(cryptoGlobal.totalMarketCapUsd)}</b>{" "}
                 <Chg pct={cryptoGlobal.changePct24h} /> (24h) · Bitcoin dominance{" "}
-                <b>{cryptoGlobal.btcDominance.toFixed(1)}%</b>
+                <b>{cryptoGlobal.btcDominance.toFixed(1)}%</b> ·{" "}
+                <Link className="statline-link" href="/kimchi-premium">
+                  Kimchi premium →
+                </Link>
               </p>
             )}
             <CryptoTable coins={crypto} live={live} />

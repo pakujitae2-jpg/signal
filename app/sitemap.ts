@@ -9,6 +9,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "hourly",
       priority: 1,
     },
+    {
+      url: `${SITE_URL}/kimchi-premium`,
+      changeFrequency: "hourly",
+      priority: 0.9,
+    },
     ...POPULAR_SYMBOLS.map((symbol) => ({
       url: `${SITE_URL}/quote/${encodeURIComponent(symbol)}`,
       changeFrequency: "hourly" as const,

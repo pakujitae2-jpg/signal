@@ -1,10 +1,5 @@
 // Canonical site origin for metadata, sitemap, and OG URLs.
-// Set NEXT_PUBLIC_SITE_URL (e.g. https://yourdomain.com) once a custom
-// domain is attached; Vercel's production URL is the fallback.
+// Production domain: rin-kaku.com. NEXT_PUBLIC_SITE_URL overrides it
+// (useful if the domain ever changes without a code push).
 
-const fromEnv =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : null) ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
-
-export const SITE_URL = (fromEnv ?? "http://localhost:3000").replace(/\/$/, "");
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://rin-kaku.com").replace(/\/$/, "");

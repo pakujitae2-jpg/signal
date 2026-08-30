@@ -1,33 +1,12 @@
 import { XMLParser } from "fast-xml-parser";
+import { fetchJson, fetchText } from "./http";
 import { NEWS_FEEDS, SYMBOLS } from "./symbols";
 import type { CryptoCoin, CryptoGlobal, MarketData, NewsItem, Quote, SourceState } from "./types";
 import { SAMPLE_CRYPTO, SAMPLE_CRYPTO_GLOBAL, SAMPLE_NEWS, SAMPLE_QUOTES } from "./sample-data";
 
 const CACHE_TTL_MS = 20_000;
-const FETCH_TIMEOUT_MS = 8_000;
-const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
 
 let cache: { data: MarketData; ts: number } | null = null;
-
-async function fetchJson(url: string): Promise<any> {
-  const res = await fetch(url, {
-    headers: { "User-Agent": UA, Accept: "application/json" },
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error(`${res.status} ${url}`);
-  return res.json();
-}
-
-async function fetchText(url: string): Promise<string> {
-  const res = await fetch(url, {
-    headers: { "User-Agent": UA },
-    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error(`${res.status} ${url}`);
-  return res.text();
-}
 
 function downsample(values: number[], target = 40): number[] {
   if (values.length <= target) return values;
