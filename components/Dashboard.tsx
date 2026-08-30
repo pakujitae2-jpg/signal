@@ -1,57 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { CryptoCoin, MarketData, NewsItem, Quote } from "@/lib/types";
+import { fmtAgo, fmtCompactUsd, fmtDate, fmtNum, fmtSigned, fmtTime } from "@/lib/format";
+import { useCryptoStream, type LiveTick } from "@/lib/useCryptoStream";
 import { AFFILIATES, AFFILIATE_DISCLOSURE } from "@/config/affiliates";
 import AdSlot from "./AdSlot";
 
 const REFRESH_MS = 30_000;
 
-/* ---------- Formatters (locale/timezone pinned so SSR and client agree) ---------- */
-
-const CURRENCY_SIGN: Record<string, string> = { KRW: "₩", JPY: "¥", USD: "$" };
-
-function fmtNum(v: number | null, currency?: string): string {
-  if (v === null || !isFinite(v)) return "—";
-  const abs = Math.abs(v);
-  const digits = abs >= 10000 ? 0 : abs >= 1 ? 2 : 4;
-  const s = v.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits });
-  return currency ? `${CURRENCY_SIGN[currency] ?? ""}${s}` : s;
-}
-
-function fmtSigned(v: number | null): string {
-  if (v === null || !isFinite(v)) return "—";
-  const sign = v > 0 ? "+" : v < 0 ? "−" : "";
-  const abs = Math.abs(v);
-  const digits = abs >= 10000 ? 0 : abs >= 0.01 ? 2 : 4;
-  return `${sign}${abs.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
-}
-
-function fmtCompactUsd(v: number): string {
-  if (!isFinite(v)) return "—";
-  return `$${v.toLocaleString("en-US", { notation: "compact", maximumFractionDigits: 2 })}`;
-}
-
-function fmtDate(iso: string): string {
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return "—";
-  return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone: "UTC" });
-}
-
-function fmtTime(iso: string): string {
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return "—";
-  return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false, timeZone: "UTC" });
-}
-
-function fmtAgo(iso: string, nowMs: number): string {
-  const t = new Date(iso).getTime();
-  if (isNaN(t)) return "";
-  const s = Math.max(0, Math.floor((nowMs - t) / 1000));
-  if (s < 60) return `${s}s ago`;
-  if (s < 3600) return `${Math.floor(s / 60)} min ago`;
-  if (s < 86400) return `${Math.floor(s / 3600)} hr ago`;
-  return `${Math.floor(s / 86400)} days ago`;
+function quoteHref(symbol: string): string {
+  return `/quote/${encodeURIComponent(symbol)}`;
 }
 
 /* ---------- Change value (arrow + sign accompany color, so direction never relies on color alone) ---------- */
@@ -106,9 +66,9 @@ function EquitiesBlock({ title, venue, index, stocks }: { title: string; venue: 
           <span className="mkt-venue">{venue}</span>
         </span>
         {index && (
-          <span className="mkt-idx">
+          <Link className="mkt-idx" href={quoteHref(index.symbol)}>
             {index.name} <b>{fmtNum(index.price)}</b> <Chg pct={index.changePct} />
-          </span>
+          </Link>
         )}
       </div>
       <div className="table-scroll">
@@ -125,8 +85,10 @@ function EquitiesBlock({ title, venue, index, stocks }: { title: string; venue: 
             {stocks.map((q) => (
               <tr key={q.symbol}>
                 <td>
-                  <span className="cell-name">{q.name}</span>
-                  <span className="sym">{q.symbol.replace(/\.(KS|T)$/, "")}</span>
+                  <Link className="qlink" href={quoteHref(q.symbol)}>
+                    <span className="cell-name">{q.name}</span>
+                    <span className="sym">{q.symbol.replace(/\.(KS|T)$/, "")}</span>
+                  </Link>
                 </td>
                 <td>{fmtNum(q.price, q.currency)}</td>
                 <td className={chgClass(q.change)}>{fmtSigned(q.change)}</td>
@@ -142,7 +104,7 @@ function EquitiesBlock({ title, venue, index, stocks }: { title: string; venue: 
   );
 }
 
-function CryptoTable({ coins }: { coins: CryptoCoin[] }) {
+function CryptoTable({ coins, live }: { coins: CryptoCoin[]; live: Record<string, LiveTick> }) {
   return (
     <div className="table-scroll">
       <table className="mkt">
@@ -157,23 +119,37 @@ function CryptoTable({ coins }: { coins: CryptoCoin[] }) {
           </tr>
         </thead>
         <tbody>
-          {coins.map((coin) => (
-            <tr key={coin.id}>
-              <td style={{ textAlign: "left", color: "var(--ink-3)" }}>{coin.rank}</td>
-              <td style={{ textAlign: "left" }}>
-                <span className="cell-name">{coin.name}</span>
-                <span className="sym">{coin.symbol}</span>
-              </td>
-              <td>{fmtNum(coin.price, "USD")}</td>
-              <td>
-                <Chg pct={coin.changePct24h} />
-              </td>
-              <td>{fmtCompactUsd(coin.marketCap)}</td>
-              <td>
-                <Sparkline data={coin.spark} pct={coin.changePct24h} w={64} h={22} />
-              </td>
-            </tr>
-          ))}
+          {coins.map((coin) => {
+            const tick = live[coin.symbol];
+            const price = tick?.price ?? coin.price;
+            const pct = tick?.changePct24h ?? coin.changePct24h;
+            return (
+              <tr key={coin.id}>
+                <td style={{ textAlign: "left", color: "var(--ink-3)" }}>{coin.rank}</td>
+                <td style={{ textAlign: "left" }}>
+                  <Link className="qlink" href={quoteHref(`${coin.symbol}-USD`)}>
+                    <span className="cell-name">{coin.name}</span>
+                    <span className="sym">{coin.symbol}</span>
+                  </Link>
+                </td>
+                <td>
+                  <span
+                    key={tick?.seq ?? 0}
+                    className={tick ? (tick.dir > 0 ? "tick tick-up" : tick.dir < 0 ? "tick tick-down" : "tick") : undefined}
+                  >
+                    {fmtNum(price, "USD")}
+                  </span>
+                </td>
+                <td>
+                  <Chg pct={pct} />
+                </td>
+                <td>{fmtCompactUsd(coin.marketCap)}</td>
+                <td>
+                  <Sparkline data={coin.spark} pct={pct} w={64} h={22} />
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -191,6 +167,7 @@ const NEWS_CAT_LABEL: Record<NewsItem["category"], string> = {
 export default function Dashboard({ initialData }: { initialData: MarketData }) {
   const [data, setData] = useState<MarketData>(initialData);
   const [now, setNow] = useState<number | null>(null); // relative times render only after mount (hydration-safe)
+  const { live, connected } = useCryptoStream(data.crypto);
 
   useEffect(() => {
     let stopped = false;
@@ -236,12 +213,15 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
   const tickerItems: { key: string; name: string; value: string; pct: number | null }[] = [
     ...allIndices.map((q) => ({ key: q.symbol, name: q.name, value: fmtNum(q.price), pct: q.changePct })),
     ...fx.map((q) => ({ key: q.symbol, name: q.name, value: fmtNum(q.price), pct: q.changePct })),
-    ...crypto.slice(0, 2).map((coin) => ({
-      key: coin.id,
-      name: coin.symbol,
-      value: fmtNum(coin.price, "USD"),
-      pct: coin.changePct24h,
-    })),
+    ...crypto.slice(0, 2).map((coin) => {
+      const tick = live[coin.symbol];
+      return {
+        key: coin.id,
+        name: coin.symbol,
+        value: fmtNum(tick?.price ?? coin.price, "USD"),
+        pct: tick?.changePct24h ?? coin.changePct24h,
+      };
+    }),
   ];
 
   const partnerCategories = Array.from(new Set(AFFILIATES.map((p) => p.category)));
@@ -291,14 +271,14 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
             </div>
             <div className="board">
               {allIndices.map((q) => (
-                <div className="board-cell" key={q.symbol}>
+                <Link className="board-cell" key={q.symbol} href={quoteHref(q.symbol)}>
                   <span className="b-name">{q.name}</span>
                   <span className="b-value">{fmtNum(q.price)}</span>
                   <div className="b-foot">
                     <Chg pct={q.changePct} />
                     <Sparkline data={q.spark} pct={q.changePct} />
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </section>
@@ -306,7 +286,15 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
           <section className="block">
             <div className="kicker">
               <h2 className="kicker-label">Cryptocurrencies</h2>
-              <span className="kicker-note">Top 10 by market cap · 24/7</span>
+              <span className="kicker-note">
+                {connected ? (
+                  <>
+                    <span className="live-badge">● LIVE</span> · streaming tick-by-tick
+                  </>
+                ) : (
+                  "Top 10 by market cap · 24/7"
+                )}
+              </span>
             </div>
             {cryptoGlobal && (
               <p className="statline">
@@ -315,7 +303,7 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
                 <b>{cryptoGlobal.btcDominance.toFixed(1)}%</b>
               </p>
             )}
-            <CryptoTable coins={crypto} />
+            <CryptoTable coins={crypto} live={live} />
           </section>
 
           <section className="block">
@@ -334,14 +322,14 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
             </div>
             <div className="board">
               {[...fx, ...commodities].map((q) => (
-                <div className="board-cell" key={q.symbol}>
+                <Link className="board-cell" key={q.symbol} href={quoteHref(q.symbol)}>
                   <span className="b-name">{q.name}</span>
                   <span className="b-value">{fmtNum(q.price, q.symbol.endsWith("=F") ? q.currency : undefined)}</span>
                   <div className="b-foot">
                     <Chg pct={q.changePct} />
                     <Sparkline data={q.spark} pct={q.changePct} />
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </section>
@@ -395,11 +383,11 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
       <footer className="colophon">
         <p>
           <b>Signal</b> — US, Japanese and Korean equities, cryptocurrencies, currencies and commodities on a single
-          page. Prices refresh automatically every 30 seconds.
+          page. Crypto streams live; other prices refresh every 30 seconds.
         </p>
         <p className="fine">
           Market data may be delayed and is provided for information only, not investment advice. Sources: Yahoo
-          Finance, CoinGecko, publisher RSS feeds.
+          Finance, CoinGecko, Binance stream, publisher RSS feeds.
         </p>
         <p className="fine">© {new Date().getFullYear()} Signal</p>
       </footer>
