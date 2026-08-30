@@ -20,11 +20,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily" as const,
       priority: 0.9,
     },
-    {
-      url: `${SITE_URL}/quotes`,
+    ...["", "/ko", "/ja"].map((p) => ({
+      url: `${SITE_URL}${p}/quotes`,
       changeFrequency: "weekly" as const,
       priority: 0.8,
-    },
+    })),
     {
       url: `${SITE_URL}/convert`,
       changeFrequency: "weekly" as const,
@@ -49,10 +49,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: /^\d/.test(slug) ? 0.6 : 0.8,
       })),
     ]),
-    ...POPULAR_SYMBOLS.map((symbol) => ({
-      url: `${SITE_URL}/quote/${encodeURIComponent(symbol)}`,
-      changeFrequency: "hourly" as const,
-      priority: 0.7,
-    })),
+    // Quote pages exist in English, Korean and Japanese.
+    ...["", "/ko", "/ja"].flatMap((p) =>
+      POPULAR_SYMBOLS.map((symbol) => ({
+        url: `${SITE_URL}${p}/quote/${encodeURIComponent(symbol)}`,
+        changeFrequency: "hourly" as const,
+        priority: 0.7,
+      }))
+    ),
   ];
 }

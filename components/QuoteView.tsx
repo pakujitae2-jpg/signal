@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AFFILIATES, AFFILIATE_DISCLOSURE } from "@/config/affiliates";
 import { fmtNum, fmtSigned } from "@/lib/format";
 import type { QuoteDetail } from "@/lib/quote";
+import type { QuoteLabels } from "@/lib/quote-copy";
 import { RANGE_LABEL, RANGES, type Range } from "@/lib/ranges";
 import AdSlot from "./AdSlot";
 
@@ -162,7 +163,20 @@ function PriceChart({ detail, base }: { detail: QuoteDetail; base: number | null
 
 /* ---------- page body ---------- */
 
-export default function QuoteView({ symbol, initial }: { symbol: string; initial: QuoteDetail }) {
+/** Period labels arrive with a {r} placeholder for the active chart range. */
+function withRange(template: string, range: Range): string {
+  return template.replace("{r}", RANGE_LABEL[range]);
+}
+
+export default function QuoteView({
+  symbol,
+  initial,
+  t,
+}: {
+  symbol: string;
+  initial: QuoteDetail;
+  t: QuoteLabels;
+}) {
   const [byRange, setByRange] = useState<Partial<Record<Range, QuoteDetail>>>({ [initial.range]: initial });
   const [range, setRange] = useState<Range>(initial.range);
   const [loading, setLoading] = useState(false);
@@ -177,8 +191,9 @@ export default function QuoteView({ symbol, initial }: { symbol: string; initial
     try {
       const res = await fetch(`/api/quote/${encodeURIComponent(symbol)}?range=${r}`);
       if (res.ok) {
+        // The API answers in English; keep the name the server localized.
         const d = (await res.json()) as QuoteDetail;
-        setByRange((prev) => ({ ...prev, [r]: d }));
+        setByRange((prev) => ({ ...prev, [r]: { ...d, name: initial.name } }));
       }
     } catch {
       // keep whatever is on screen
@@ -201,12 +216,12 @@ export default function QuoteView({ symbol, initial }: { symbol: string; initial
   const partners = AFFILIATES.filter((p) => p.category === (isCrypto ? "Crypto Exchanges" : "Brokerages")).slice(0, 3);
 
   const stats: { label: string; value: string }[] = [
-    { label: "Previous close", value: fmtNum(day.prevClose, day.currency) },
-    { label: "Day change", value: `${fmtSigned(dayChange)}` },
-    { label: `${RANGE_LABEL[detail.range]} high`, value: fmtNum(periodHigh, detail.currency) },
-    { label: `${RANGE_LABEL[detail.range]} low`, value: fmtNum(periodLow, detail.currency) },
-    ...(day.fiftyTwoWeekHigh !== null ? [{ label: "52-week high", value: fmtNum(day.fiftyTwoWeekHigh, day.currency) }] : []),
-    ...(day.fiftyTwoWeekLow !== null ? [{ label: "52-week low", value: fmtNum(day.fiftyTwoWeekLow, day.currency) }] : []),
+    { label: t.prevClose, value: fmtNum(day.prevClose, day.currency) },
+    { label: t.dayChange, value: `${fmtSigned(dayChange)}` },
+    { label: withRange(t.periodHigh, detail.range), value: fmtNum(periodHigh, detail.currency) },
+    { label: withRange(t.periodLow, detail.range), value: fmtNum(periodLow, detail.currency) },
+    ...(day.fiftyTwoWeekHigh !== null ? [{ label: t.high52, value: fmtNum(day.fiftyTwoWeekHigh, day.currency) }] : []),
+    ...(day.fiftyTwoWeekLow !== null ? [{ label: t.low52, value: fmtNum(day.fiftyTwoWeekLow, day.currency) }] : []),
   ];
 
   return (
@@ -230,13 +245,11 @@ export default function QuoteView({ symbol, initial }: { symbol: string; initial
         </div>
       </div>
 
-      {detail.source === "sample" && (
-        <p className="wire-note">Note: sample figures shown — live data connects automatically in production deployments.</p>
-      )}
+      {detail.source === "sample" && <p className="wire-note">{t.sampleNote}</p>}
 
       <section className="block">
         <div className="kicker">
-          <div className="range-row" role="tablist" aria-label="Chart range">
+          <div className="range-row" role="tablist" aria-label={t.chartRange}>
             {RANGES.map((r) => (
               <button
                 key={r}
@@ -250,9 +263,9 @@ export default function QuoteView({ symbol, initial }: { symbol: string; initial
             ))}
           </div>
           <span className="kicker-note">
-            {loading ? "Loading…" : (
+            {loading ? t.loading : (
               <>
-                {RANGE_LABEL[detail.range]} change <Chg pct={periodPct} />
+                {withRange(t.periodChange, detail.range)} <Chg pct={periodPct} />
               </>
             )}
           </span>
@@ -262,7 +275,7 @@ export default function QuoteView({ symbol, initial }: { symbol: string; initial
 
       <section className="block">
         <div className="kicker">
-          <h2 className="kicker-label">Key Stats</h2>
+          <h2 className="kicker-label">{t.keyStats}</h2>
         </div>
         <div className="board stats-board">
           {stats.map((s) => (
@@ -278,8 +291,8 @@ export default function QuoteView({ symbol, initial }: { symbol: string; initial
 
       <section className="block">
         <div className="kicker">
-          <h2 className="kicker-label">Trade {isCrypto ? "Crypto" : "Stocks"}</h2>
-          <span className="kicker-note">Partner offers</span>
+          <h2 className="kicker-label">{t.trade}</h2>
+          <span className="kicker-note">{t.partnerOffers}</span>
         </div>
         {partners.map((p) => (
           <a className="p-row" key={p.name} href={p.url} target="_blank" rel="noopener noreferrer sponsored">

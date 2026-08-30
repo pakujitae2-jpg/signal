@@ -81,6 +81,30 @@ export function curCountry(lang: Lang, code: string): string {
   return CURRENCIES[code]?.countries ?? code;
 }
 
+// Korean particles agree with the final consonant of the preceding syllable.
+// Only used on words we know are Hangul (currency names).
+function hasBatchim(word: string): boolean {
+  const ch = word.trim().slice(-1);
+  const code = ch.charCodeAt(0);
+  if (code < 0xac00 || code > 0xd7a3) return false;
+  return (code - 0xac00) % 28 !== 0;
+}
+function jongseong(word: string): number {
+  const code = word.trim().slice(-1).charCodeAt(0);
+  return code >= 0xac00 && code <= 0xd7a3 ? (code - 0xac00) % 28 : 0;
+}
+/** Particle only, so a "(USD)" can sit between the word and its particle. */
+export const eunP = (w: string) => (hasBatchim(w) ? "은" : "는");
+export const eulP = (w: string) => (hasBatchim(w) ? "을" : "를");
+/** 으로/로 — a final ㄹ (jongseong 8) takes 로. */
+export const euroP = (w: string) => {
+  const j = jongseong(w);
+  return j === 0 || j === 8 ? "로" : "으로";
+};
+/** 은/는 */ export const eun = (w: string) => w + eunP(w);
+/** 을/를 */ export const eul = (w: string) => w + eulP(w);
+/** 으로/로 */ export const euro = (w: string) => w + euroP(w);
+
 type Fmt = (v: number) => string;
 
 /** Copy for the pair / amount / hub / index pages. Rates arrive pre-formatted. */
@@ -227,17 +251,17 @@ const KO_COPY: Copy = {
   amountDesc: (a, b, q, res, r) => `${a} ${curName("ko", b)}(${b})는 오늘 환율(1 ${b} = ${r} ${q}) 기준 ${res} ${curName("ko", q)}(${q})입니다. 실시간 환율 계산기, 환산표, 30일 추이.`,
   h1Pair: (b, q) => `${curName("ko", b)} → ${curName("ko", q)} 환율`,
   h1Amount: (a, b, q) => `${a} ${curName("ko", b)}를 ${curName("ko", q)}로`,
-  leadPair: (b, q, r, inv) => `현재 1 ${curName("ko", b)}는 ${r} ${curName("ko", q)}이고, 1 ${curName("ko", q)}는 ${inv} ${curName("ko", b)}입니다.`,
-  leadAmount: (a, b, q, res, r, inv) => `${a} ${curName("ko", b)}는 현재 시장 중간가(1 ${b} = ${r} ${q}) 기준 ${res} ${curName("ko", q)}입니다. 반대로 ${a} ${curName("ko", q)}는 ${inv} ${curName("ko", b)}입니다.`,
+  leadPair: (b, q, r, inv) => `현재 1 ${eun(curName("ko", b))} ${r} ${curName("ko", q)}, 1 ${eun(curName("ko", q))} ${inv} ${curName("ko", b)}입니다.`,
+  leadAmount: (a, b, q, res, r, inv) => `${a} ${eun(curName("ko", b))} 현재 시장 중간가(1 ${b} = ${r} ${q}) 기준 ${res} ${curName("ko", q)}입니다. 반대로 ${a} ${eun(curName("ko", q))} ${inv} ${curName("ko", b)}입니다.`,
   moveDay: (d, p) => ` 전일 종가 대비 ${p}% ${dir3(d, "상승", "하락", "보합")}했습니다.`,
   moveMonth: (d, p, b, q, then) => ` 최근 30일 동안 ${p}% ${dir3(d, "올랐으며", "내렸으며", "변동이 없으며")}, 30일 전에는 1 ${b}가 ${then} ${q}였습니다.`,
-  aboutBody: (b, q) => `이 페이지는 ${curCountry("ko", b)}에서 쓰이는 ${curName("ko", b)}(${b})를 ${curCountry("ko", q)}에서 쓰이는 ${curName("ko", q)}(${q})로 환산합니다. 표시되는 환율은 전 세계 매수·매도 호가의 중간값인 시장 중간가로, 외환 거래 시간 동안 계속 갱신됩니다. 은행과 송금 서비스는 여기에 수수료(스프레드)를 더하므로 실제 환전 시 받는 금액은 이보다 다소 적습니다.`,
+  aboutBody: (b, q) => `이 페이지는 ${curCountry("ko", b)}에서 쓰이는 ${curName("ko", b)}(${b})${eulP(curName("ko", b))} ${curCountry("ko", q)}에서 쓰이는 ${curName("ko", q)}(${q})${euroP(curName("ko", q))} 환산합니다. 표시되는 환율은 전 세계 매수·매도 호가의 중간값인 시장 중간가로, 외환 거래 시간 동안 계속 갱신됩니다. 은행과 송금 서비스는 여기에 수수료(스프레드)를 더하므로 실제 환전 시 받는 금액은 이보다 다소 적습니다.`,
   hubTitle: (c) => `${curName("ko", c)}(${c}) 환율`,
   hubDesc: (c, n) => `${curName("ko", c)}와 ${n}개 통화 간 실시간 환율, 환율 계산기, 환산표, 30일 추이.`,
   hubToOthers: (c) => `${curShort("ko", c)} → 다른 통화`,
   hubOthersTo: (c) => `다른 통화 → ${curShort("ko", c)}`,
   hubAbout: (c) => `${curName("ko", c)}에 대해`,
-  hubAboutBody: (c) => `${curName("ko", c)}(${c}, ${CURRENCIES[c].symbol})는 ${curCountry("ko", c)}의 통화입니다. 위 링크의 모든 페이지는 시장 중간가 기준 실시간 환율과 양방향 계산기, 금액별 환산표, 30일 추이를 제공합니다.`,
+  hubAboutBody: (c) => `${eun(curName("ko", c))} ${curCountry("ko", c)}의 통화이며, 통화 코드는 ${c}, 기호는 ${CURRENCIES[c].symbol}입니다. 위 링크의 모든 페이지는 시장 중간가 기준 실시간 환율과 양방향 계산기, 금액별 환산표, 30일 추이를 제공합니다.`,
   indexTitle: "실시간 환율 계산기 — 달러·엔화·유로·위안 환율",
   indexDesc: (n) => `${n}개 통화의 실시간 시장 중간가 환율 — 달러, 유로, 엔화, 파운드, 위안 등 — 환율 계산기, 환산표, 30일 추이 제공.`,
   indexH1: "환율 계산기",
