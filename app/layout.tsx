@@ -5,21 +5,21 @@ import "./globals.css";
 const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
 export const metadata: Metadata = {
-  title: "시그널 — 암호화폐·미국·일본·한국 마켓을 한눈에",
+  title: "Signal · Global Markets at a Glance",
   description:
-    "암호화폐, 미국·일본·한국 주식, 환율, 원자재, 실시간 뉴스까지. 전 세계 시장 정보를 한 화면에서 가장 빠르게 확인하세요.",
-  keywords: ["암호화폐", "비트코인", "코스피", "나스닥", "닛케이", "환율", "주식", "시세"],
+    "Live prices for US, Japanese and Korean stocks, top cryptocurrencies, currencies and commodities — with the latest market headlines, on a single page.",
+  keywords: ["stocks", "crypto", "bitcoin", "S&P 500", "Nikkei", "KOSPI", "markets", "prices", "forex"],
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0d0e12",
+  themeColor: "#f9f8f4",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko">
+    <html lang="en">
       <body>
         {children}
         {ADSENSE_CLIENT && (

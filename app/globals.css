@@ -1,18 +1,18 @@
 :root {
-  color-scheme: dark;
-  /* 검증된 팔레트 (dataviz validator PASS: 대비·색각이상 분리) */
-  --bg: #0d0e12;
-  --surface: #131417;
-  --surface-2: #1a1c21;
-  --ink: #f2f4f8;
-  --ink-2: #a6adbb;
-  --ink-muted: #7d8695;
-  --hairline: rgba(255, 255, 255, 0.08);
-  --up: #e66767;   /* 상승 = 빨강 (국내 관례) */
-  --down: #3987e5; /* 하락 = 파랑 */
-  --flat: #8b93a1;
-  --accent: #e8b04b;
-  --radius: 12px;
+  color-scheme: light;
+  /* Editorial palette. Up/down pair validated for contrast and
+     color-vision-deficiency separation on this paper surface. */
+  --paper: #f9f8f4;
+  --paper-2: #f3f1e9;
+  --ink: #1a1916;
+  --ink-2: #55524a;
+  --ink-3: #8b877c;
+  --rule: #dcd9cf;
+  --up: #0d7d55;
+  --down: #c62828;
+  --flat: #77746b;
+  --serif: Georgia, "Iowan Old Style", "Times New Roman", Times, serif;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 
 * {
@@ -26,11 +26,12 @@ body {
 }
 
 body {
-  background: var(--bg);
+  background: var(--paper);
   color: var(--ink);
-  font-family: system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  font-family: var(--sans);
   font-size: 14px;
   line-height: 1.5;
+  border-top: 3px solid var(--ink);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -39,75 +40,80 @@ a {
   text-decoration: none;
 }
 
-/* ---------- 헤더 ---------- */
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
+.paper {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------- Masthead ---------- */
+.masthead {
+  text-align: center;
+  padding: 26px 0 18px;
+}
+
+.wordmark {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 46px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-indent: 0.16em; /* optically re-center the letterspaced wordmark */
+  line-height: 1;
+}
+
+.tagline {
+  margin: 10px 0 0;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.dateline {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 12px 20px;
-  background: rgba(13, 14, 18, 0.86);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--hairline);
-}
-
-.brand {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.brand-mark {
-  font-size: 19px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  color: var(--accent);
-}
-
-.brand-sub {
-  font-size: 12.5px;
+  padding: 7px 2px;
+  border-top: 3px double var(--ink);
+  border-bottom: 1px solid var(--ink);
+  font-size: 12px;
   color: var(--ink-2);
 }
 
-.header-meta {
-  display: flex;
+.dateline-status {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  color: var(--ink-2);
+  gap: 7px;
   font-variant-numeric: tabular-nums;
 }
 
-.live-dot {
-  width: 8px;
-  height: 8px;
+.status-dot {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: #21c06b;
-  box-shadow: 0 0 0 3px rgba(33, 192, 107, 0.18);
+  background: var(--up);
 }
 
-.live-dot.sample {
-  background: var(--accent);
-  box-shadow: 0 0 0 3px rgba(232, 176, 75, 0.18);
+.status-dot.sample {
+  background: #b59a3e;
 }
 
-/* ---------- 티커 테이프 ---------- */
+/* ---------- Ticker ---------- */
 .ticker-wrap {
   overflow: hidden;
-  border-bottom: 1px solid var(--hairline);
-  background: var(--surface);
   white-space: nowrap;
+  border-bottom: 1px solid var(--rule);
 }
 
 .ticker {
   display: inline-flex;
   align-items: center;
-  gap: 28px;
-  padding: 8px 0 8px 28px;
-  animation: ticker-scroll 45s linear infinite;
+  gap: 30px;
+  padding: 7px 0 7px 30px;
+  animation: ticker-scroll 50s linear infinite;
   will-change: transform;
 }
 
@@ -122,106 +128,149 @@ a {
 
 .ticker-item {
   display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
+  align-items: baseline;
+  gap: 7px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
 
 .ticker-item .t-name {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Notes & ads ---------- */
+.wire-note {
+  margin: 14px 0 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
   color: var(--ink-2);
 }
 
-/* ---------- 레이아웃 ---------- */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px 20px 56px;
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
+.ad-unit {
+  margin: 18px 0;
+  text-align: center;
 }
 
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 12px;
-  font-size: 16px;
-  font-weight: 700;
+.ad-label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
 }
 
-.section-title::before {
-  content: "";
-  width: 4px;
-  height: 16px;
-  border-radius: 2px;
-  background: var(--accent);
+.ad-space {
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
 }
 
-.section-title .sub {
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--ink-muted);
+.ad-leaderboard .ad-space {
+  height: 90px;
 }
 
-/* ---------- 안내 배너 ---------- */
-.notice {
-  padding: 10px 14px;
-  border: 1px solid rgba(232, 176, 75, 0.35);
-  background: rgba(232, 176, 75, 0.08);
-  border-radius: var(--radius);
-  color: var(--ink-2);
-  font-size: 12.5px;
+.ad-rectangle .ad-space {
+  height: 250px;
 }
 
-/* ---------- 스탯 타일 ---------- */
-.tile-grid {
+/* ---------- Page grid ---------- */
+.sheet {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(172px, 1fr));
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 0 36px;
+  padding: 6px 0 40px;
 }
 
-.tile {
-  background: var(--surface);
-  border: 1px solid var(--hairline);
-  border-radius: var(--radius);
-  padding: 12px 14px;
+.col-main {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 30px;
   min-width: 0;
 }
 
-.tile .t-name {
-  font-size: 12.5px;
+.col-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+/* ---------- Section blocks ---------- */
+.block {
+  border-top: 2px solid var(--ink);
+}
+
+.kicker {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0 12px;
+}
+
+.kicker-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.kicker-note {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+/* ---------- Index board ---------- */
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-left: 1px solid var(--rule);
+  border-top: 1px solid var(--rule);
+}
+
+.board-cell {
+  padding: 12px 14px;
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  min-width: 0;
+}
+
+.b-name {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: var(--ink-2);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.tile .t-price {
-  font-size: 19px;
+.b-value {
+  display: block;
+  margin-top: 4px;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
 }
 
-.tile .t-foot {
+.b-foot {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  margin-top: 3px;
 }
 
-.tile svg {
-  flex: 0 0 auto;
-}
-
-/* ---------- 등락 표시 ---------- */
+/* ---------- Change values ---------- */
 .chg {
   font-variant-numeric: tabular-nums;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -230,242 +279,255 @@ a {
 .chg.down { color: var(--down); }
 .chg.flat { color: var(--flat); }
 
-/* ---------- 카드 & 테이블 ---------- */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--hairline);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-
-.card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--hairline);
-  font-weight: 700;
-  font-size: 13.5px;
-}
-
-.card-head .idx {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  font-weight: 400;
+/* ---------- Data tables ---------- */
+.statline {
+  margin: -2px 0 10px;
+  font-size: 13px;
   color: var(--ink-2);
   font-variant-numeric: tabular-nums;
+}
+
+.statline b {
+  color: var(--ink);
 }
 
 .table-scroll {
   overflow-x: auto;
 }
 
-table.quotes {
+table.mkt {
   width: 100%;
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
+  font-size: 13px;
 }
 
-table.quotes th {
+table.mkt th {
+  padding: 0 10px 5px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
   text-align: right;
-  font-size: 11.5px;
-  font-weight: 500;
-  color: var(--ink-muted);
-  padding: 8px 14px 6px;
-  border-bottom: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--ink);
   white-space: nowrap;
 }
 
-table.quotes th:first-child,
-table.quotes td:first-child {
+table.mkt td {
+  padding: 7px 10px;
+  text-align: right;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+table.mkt th:first-child,
+table.mkt td:first-child {
   text-align: left;
+  padding-left: 2px;
 }
 
-table.quotes td {
-  padding: 9px 14px;
-  text-align: right;
-  border-bottom: 1px solid var(--hairline);
-  white-space: nowrap;
+table.mkt th:last-child,
+table.mkt td:last-child {
+  padding-right: 2px;
 }
 
-table.quotes tr:last-child td {
-  border-bottom: none;
+table.mkt tbody tr:hover td {
+  background: var(--paper-2);
 }
 
-table.quotes tr:hover td {
-  background: var(--surface-2);
-}
-
-.q-name {
+.cell-name {
   font-weight: 600;
 }
 
-.q-sym {
+.sym {
   margin-left: 6px;
-  font-size: 11px;
-  color: var(--ink-muted);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  letter-spacing: 0.03em;
 }
 
-.regions-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 12px;
+/* ---------- Equities market header ---------- */
+.mkt-block + .mkt-block {
+  margin-top: 20px;
 }
 
-.crypto-summary {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(172px, 1fr));
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-/* ---------- 뉴스 ---------- */
-.news-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.news-item {
+.mkt-head {
   display: flex;
   align-items: baseline;
-  gap: 10px;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--hairline);
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 6px;
 }
 
-.news-item:last-child {
-  border-bottom: none;
+.mkt-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.news-item:hover {
-  background: var(--surface-2);
+.mkt-venue {
+  margin-left: 8px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
 }
 
-.news-cat {
-  flex: 0 0 auto;
-  font-size: 11px;
-  padding: 1px 7px;
-  border-radius: 999px;
-  border: 1px solid var(--hairline);
+.mkt-idx {
+  font-size: 12px;
   color: var(--ink-2);
-}
-
-.news-title {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.news-meta {
-  flex: 0 0 auto;
-  font-size: 11.5px;
-  color: var(--ink-muted);
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- 광고 ---------- */
-.ad-slot {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-height: 90px;
-  border: 1px dashed rgba(255, 255, 255, 0.16);
-  border-radius: var(--radius);
-  color: var(--ink-muted);
-  font-size: 12.5px;
-  background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.015) 10px, rgba(255, 255, 255, 0.015) 20px);
+.mkt-idx b {
+  color: var(--ink);
 }
 
-.ad-slot-tag {
+/* ---------- Rail modules ---------- */
+.rail-mod {
+  border-top: 3px double var(--ink);
+}
+
+.news-item {
+  display: block;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.news-item:hover .news-title {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.news-title {
+  display: block;
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.news-item:first-of-type .news-title {
+  font-size: 17px;
+}
+
+.news-meta {
+  display: block;
+  margin-top: 4px;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Partners ---------- */
+.p-cat {
+  margin: 14px 0 2px;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  padding: 2px 6px;
-  border: 1px solid var(--hairline);
-  border-radius: 4px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
 }
 
-.ad-slot-live {
-  min-height: 90px;
-}
-
-/* ---------- 파트너(어필리에이트) ---------- */
-.partner-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 10px;
-}
-
-.partner-card {
+.p-row {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 14px;
-  background: var(--surface);
-  border: 1px solid var(--hairline);
-  border-radius: var(--radius);
-  transition: border-color 0.15s;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
 }
 
-.partner-card:hover {
-  border-color: rgba(232, 176, 75, 0.5);
+.p-row:hover .p-name {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
-.partner-badge {
-  align-self: flex-start;
-  font-size: 10.5px;
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: rgba(232, 176, 75, 0.12);
-  color: var(--accent);
+.p-main {
+  min-width: 0;
 }
 
-.partner-name {
+.p-name {
+  font-size: 13.5px;
   font-weight: 700;
-  font-size: 14px;
 }
 
-.partner-desc {
+.p-desc {
+  display: block;
+  margin-top: 1px;
   font-size: 12px;
   color: var(--ink-2);
 }
 
-.disclosure {
-  margin-top: 8px;
-  font-size: 11.5px;
-  color: var(--ink-muted);
+.p-arrow {
+  flex: 0 0 auto;
+  font-size: 13px;
+  color: var(--ink-3);
 }
 
-/* ---------- 푸터 ---------- */
-.site-footer {
-  border-top: 1px solid var(--hairline);
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  color: var(--ink-muted);
+.fineprint {
+  margin: 10px 0 0;
+  font-family: var(--serif);
+  font-style: italic;
   font-size: 11.5px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  line-height: 1.45;
+  color: var(--ink-3);
+}
+
+/* ---------- Colophon ---------- */
+.colophon {
+  border-top: 2px solid var(--ink);
+  padding: 16px 0 34px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.colophon p {
+  margin: 0 0 4px;
+}
+
+.colophon .fine {
+  color: var(--ink-3);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .sheet {
+    grid-template-columns: 1fr;
+  }
+
+  .col-rail {
+    margin-top: 30px;
+  }
 }
 
 @media (max-width: 640px) {
-  .container {
-    padding: 14px 12px 40px;
-    gap: 20px;
+  .paper {
+    padding: 0 14px;
   }
 
-  .site-header {
-    padding: 10px 12px;
+  .masthead {
+    padding: 20px 0 14px;
   }
 
-  .brand-sub {
-    display: none;
+  .wordmark {
+    font-size: 34px;
+  }
+
+  .dateline {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+  }
+
+  .board {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .b-value {
+    font-size: 19px;
   }
 }
