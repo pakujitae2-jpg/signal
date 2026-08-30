@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { KimchiData } from "@/lib/kimchi";
+import type { KimchiCopy } from "@/lib/page-copy";
 import { fmtAgo, fmtNum, fmtTime } from "@/lib/format";
 
 const REFRESH_MS = 30_000;
@@ -17,7 +18,16 @@ function Premium({ pct, size = 13 }: { pct: number; size?: number }) {
   );
 }
 
-export default function KimchiView({ initial }: { initial: KimchiData }) {
+/** coinNames maps a coin symbol to its localized name; the table falls back to the English name. */
+export default function KimchiView({
+  initial,
+  t,
+  coinNames,
+}: {
+  initial: KimchiData;
+  t: KimchiCopy;
+  coinNames: Record<string, string>;
+}) {
   const [data, setData] = useState<KimchiData>(initial);
   const [now, setNow] = useState<number | null>(null);
 
@@ -60,35 +70,33 @@ export default function KimchiView({ initial }: { initial: KimchiData }) {
     <>
       <div className="quote-head">
         <div>
-          <h1 className="quote-name">Kimchi Premium</h1>
+          <h1 className="quote-name">{t.h1}</h1>
           <p className="quote-sub">
-            Korea's crypto price gap · Upbit vs global markets · updated {fmtTime(data.updatedAt)} UTC
+            {t.sub.replace("{time}", fmtTime(data.updatedAt))}
             {now !== null && ` · ${fmtAgo(data.updatedAt, now)}`}
           </p>
         </div>
       </div>
 
-      {data.source === "sample" && (
-        <p className="wire-note">Note: sample figures shown — live data connects automatically in production deployments.</p>
-      )}
+      {data.source === "sample" && <p className="wire-note">{t.sampleNote}</p>}
 
       <section className="block">
         <div className="kicker">
-          <h2 className="kicker-label">Right Now</h2>
+          <h2 className="kicker-label">{t.rightNow}</h2>
         </div>
         <div className="board">
           <div className="board-cell">
-            <span className="b-name">Bitcoin premium</span>
+            <span className="b-name">{t.btcPremium}</span>
             <span className="b-value">{btc ? <Premium pct={btc.premiumPct} size={26} /> : "—"}</span>
           </div>
           <div className="board-cell">
-            <span className="b-name">Average premium · {data.rows.length} coins</span>
+            <span className="b-name">{t.avgPremium.replace("{n}", String(data.rows.length))}</span>
             <span className="b-value">
               <Premium pct={avg} size={26} />
             </span>
           </div>
           <div className="board-cell">
-            <span className="b-name">USD/KRW</span>
+            <span className="b-name">{t.usdKrw}</span>
             <span className="b-value">{fmtNum(data.usdKrw)}</span>
           </div>
         </div>
@@ -96,25 +104,25 @@ export default function KimchiView({ initial }: { initial: KimchiData }) {
 
       <section className="block">
         <div className="kicker">
-          <h2 className="kicker-label">By Coin</h2>
-          <span className="kicker-note">Upbit KRW vs global USD</span>
+          <h2 className="kicker-label">{t.byCoin}</h2>
+          <span className="kicker-note">{t.byCoinNote}</span>
         </div>
         <div className="table-scroll">
           <table className="mkt">
             <thead>
               <tr>
-                <th>Coin</th>
-                <th>Upbit (KRW)</th>
-                <th>Global (USD)</th>
-                <th>Global → KRW</th>
-                <th>Premium</th>
+                <th>{t.colCoin}</th>
+                <th>{t.colUpbit}</th>
+                <th>{t.colGlobal}</th>
+                <th>{t.colGlobalKrw}</th>
+                <th>{t.colPremium}</th>
               </tr>
             </thead>
             <tbody>
               {data.rows.map((r) => (
                 <tr key={r.symbol}>
                   <td>
-                    <span className="cell-name">{r.name}</span>
+                    <span className="cell-name">{coinNames[r.symbol] ?? r.name}</span>
                     <span className="sym">{r.symbol}</span>
                   </td>
                   <td>{fmtNum(r.upbitKrw, "KRW")}</td>

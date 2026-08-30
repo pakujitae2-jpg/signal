@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { FearGreedData, FGPoint } from "@/lib/feargreed";
+import type { FearGreedCopy } from "@/lib/page-copy";
 import { fmtAgo, fmtTime } from "@/lib/format";
 
 const REFRESH_MS = 10 * 60_000; // the index updates once a day
@@ -103,7 +104,7 @@ function History({ points }: { points: FGPoint[] }) {
   );
 }
 
-function Stat({ name, point }: { name: string; point: FGPoint | null }) {
+function Stat({ name, point, label }: { name: string; point: FGPoint | null; label: string }) {
   return (
     <div className="board-cell">
       <span className="b-name">{name}</span>
@@ -111,13 +112,16 @@ function Stat({ name, point }: { name: string; point: FGPoint | null }) {
         {point ? point.value : "—"}
       </span>
       <div className="b-foot">
-        <span className="chg flat">{point ? point.label : "—"}</span>
+        <span className="chg flat">{point ? label : "—"}</span>
       </div>
     </div>
   );
 }
 
-export default function FearGreedView({ initial }: { initial: FearGreedData }) {
+export default function FearGreedView({ initial, t }: { initial: FearGreedData; t: FearGreedCopy }) {
+  // The API classifies in English; map it onto the locale.
+  const zone = (label: string): string =>
+    ({ "Extreme Fear": t.extremeFear, Fear: t.fear, Neutral: t.neutral, Greed: t.greed, "Extreme Greed": t.extremeGreed })[label] ?? label;
   const [data, setData] = useState<FearGreedData>(initial);
   const [now, setNow] = useState<number | null>(null);
 
@@ -148,36 +152,34 @@ export default function FearGreedView({ initial }: { initial: FearGreedData }) {
     <>
       <div className="quote-head">
         <div>
-          <h1 className="quote-name">Crypto Fear &amp; Greed Index</h1>
+          <h1 className="quote-name">{t.h1}</h1>
           <p className="quote-sub">
-            Market sentiment, 0–100 · updated {fmtTime(data.updatedAt)} UTC
+            {t.sub.replace("{time}", fmtTime(data.updatedAt))}
             {now !== null && ` · ${fmtAgo(data.updatedAt, now)}`}
           </p>
         </div>
       </div>
 
-      {data.source === "sample" && (
-        <p className="wire-note">Note: sample figures shown — live data connects automatically in production deployments.</p>
-      )}
+      {data.source === "sample" && <p className="wire-note">{t.sampleNote}</p>}
 
       <section className="block">
         <div className="kicker">
-          <h2 className="kicker-label">Today</h2>
-          <span className="kicker-note">0 = extreme fear · 100 = extreme greed</span>
+          <h2 className="kicker-label">{t.todayHeading}</h2>
+          <span className="kicker-note">{t.todayNote}</span>
         </div>
         <div className="gauge-wrap">
-          <Gauge value={data.now.value} label={data.now.label} />
+          <Gauge value={data.now.value} label={zone(data.now.label)} />
         </div>
         <div className="board">
-          <Stat name="Yesterday" point={data.yesterday} />
-          <Stat name="Last week" point={data.lastWeek} />
-          <Stat name="Last month" point={data.lastMonth} />
+          <Stat name={t.yesterday} point={data.yesterday} label={zone(data.yesterday?.label ?? "")} />
+          <Stat name={t.lastWeek} point={data.lastWeek} label={zone(data.lastWeek?.label ?? "")} />
+          <Stat name={t.lastMonth} point={data.lastMonth} label={zone(data.lastMonth?.label ?? "")} />
         </div>
       </section>
 
       <section className="block">
         <div className="kicker">
-          <h2 className="kicker-label">Last 90 Days</h2>
+          <h2 className="kicker-label">{t.historyHeading}</h2>
         </div>
         <History points={data.history} />
       </section>

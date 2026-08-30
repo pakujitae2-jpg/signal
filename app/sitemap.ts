@@ -10,16 +10,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "hourly",
       priority: 1,
     },
-    {
-      url: `${SITE_URL}/kimchi-premium`,
-      changeFrequency: "hourly",
-      priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/fear-greed`,
-      changeFrequency: "daily" as const,
-      priority: 0.9,
-    },
+    ...["", "/ko", "/ja"].flatMap((p) => [
+      { url: `${SITE_URL}${p}/kimchi-premium`, changeFrequency: "hourly" as const, priority: 0.9 },
+      { url: `${SITE_URL}${p}/fear-greed`, changeFrequency: "daily" as const, priority: 0.9 },
+    ]),
     ...["", "/ko", "/ja"].map((p) => ({
       url: `${SITE_URL}${p}/quotes`,
       changeFrequency: "weekly" as const,
@@ -30,11 +24,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly" as const,
       priority: 0.8,
     },
-    ...["us", "japan", "korea", "crypto"].map((region) => ({
-      url: `${SITE_URL}/markets/${region}`,
-      changeFrequency: "hourly" as const,
-      priority: 0.9,
-    })),
+    ...["", "/ko", "/ja"].flatMap((p) =>
+      ["us", "japan", "korea", "crypto"].map((region) => ({
+        url: `${SITE_URL}${p}/markets/${region}`,
+        changeFrequency: "hourly" as const,
+        priority: 0.9,
+      }))
+    ),
     // Currency pages exist in English, Korean and Japanese.
     ...["", "/ko", "/ja"].flatMap((p) => [
       ...(p ? [{ url: `${SITE_URL}${p}/convert`, changeFrequency: "weekly" as const, priority: 0.8 }] : []),

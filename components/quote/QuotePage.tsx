@@ -42,16 +42,19 @@ function pct(detail: QuoteDetail | null): number | null {
 
 const dirOf = (v: number): Dir => (v > 0.005 ? "up" : v < -0.005 ? "down" : "flat");
 
-/** Where this symbol's group hub lives for a locale. */
+/** Where this symbol's group hub lives. Market hubs exist in every locale. */
+const MARKET_HUB: Partial<Record<UniverseGroup, string>> = {
+  "us-stock": "/markets/us",
+  "jp-stock": "/markets/japan",
+  "kr-stock": "/markets/korea",
+  crypto: "/markets/crypto",
+};
+
 function hubHref(lang: Lang, group: UniverseGroup): string {
   const p = prefix(lang);
   if (group === "fx") return `${p}/convert`;
-  if (lang !== "en") return `${p}/quotes#${group}`;
-  if (group === "us-stock") return "/markets/us";
-  if (group === "jp-stock") return "/markets/japan";
-  if (group === "kr-stock") return "/markets/korea";
-  if (group === "crypto") return "/markets/crypto";
-  return `/quotes#${group}`;
+  const hub = MARKET_HUB[group];
+  return hub ? `${p}${hub}` : `${p}/quotes#${group}`;
 }
 
 function nameOf(lang: Lang, symbol: string, detail: QuoteDetail | null): string {

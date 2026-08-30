@@ -120,8 +120,8 @@ const KO: QuoteCopy = {
     "kr-stock": "한국 주식", crypto: "암호화폐", fx: "환율", commodity: "원자재",
   },
   hubLabel: {
-    index: "전체 종목", "us-stock": "전체 종목", etf: "전체 종목", "jp-stock": "전체 종목",
-    "kr-stock": "전체 종목", crypto: "전체 종목", fx: "환율", commodity: "전체 종목",
+    index: "전체 종목", "us-stock": "미국 증시", etf: "전체 종목", "jp-stock": "일본 증시",
+    "kr-stock": "한국 증시", crypto: "코인 시세", fx: "환율", commodity: "전체 종목",
   },
   title: (g, name, sym) => {
     if (g === "crypto") return `${name} 시세 — 실시간 가격·차트`;
@@ -179,8 +179,8 @@ const JA: QuoteCopy = {
     "kr-stock": "韓国株", crypto: "暗号資産", fx: "為替", commodity: "商品",
   },
   hubLabel: {
-    index: "全銘柄", "us-stock": "全銘柄", etf: "全銘柄", "jp-stock": "全銘柄",
-    "kr-stock": "全銘柄", crypto: "全銘柄", fx: "為替レート", commodity: "全銘柄",
+    index: "全銘柄", "us-stock": "米国株", etf: "全銘柄", "jp-stock": "日本株",
+    "kr-stock": "韓国株", crypto: "暗号資産", fx: "為替レート", commodity: "全銘柄",
   },
   title: (g, name, sym) => {
     if (g === "crypto") return `${name}の価格 — リアルタイムチャート`;
