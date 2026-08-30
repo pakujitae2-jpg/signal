@@ -8,7 +8,10 @@ import { ADSENSE_CLIENT } from "@/lib/site";
  * placeholder IDs (all zeros) keep a quiet reserved space so the layout
  * stays stable while Auto ads (loaded in the root layout) fill the page.
  */
-const hasSlot = (slot: string) => !/^0+$/.test(slot);
+// Real AdSense ad-unit IDs are 10-digit numbers that never start with 0; the
+// placeholders in this repo (0000000001…) all do. Requesting an ad for a
+// made-up unit ID is what AdSense flags, so placeholders render nothing.
+const hasSlot = (slot: string) => !/^0/.test(slot);
 export default function AdSlot({ slot, format }: { slot: string; format: "leaderboard" | "rectangle" }) {
   useEffect(() => {
     if (!hasSlot(slot)) return;

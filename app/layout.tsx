@@ -43,6 +43,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const lang = (await headers()).get("x-lang") ?? "en";
   return (
     <html lang={lang}>
+      <head>
+        {/*
+          Plain <script>, not next/script. Both `beforeInteractive` and
+          `afterInteractive` emit only a <link rel="preload"> into the served
+          HTML and inject the real tag from JavaScript after hydration, so
+          AdSense's verification crawler never finds the snippet. Rendering
+          the tag here puts it in the server-rendered <head>, which is what
+          AdSense checks for.
+        */}
+        <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+          crossOrigin="anonymous"
+        />
+      </head>
       <body>
         {/* Secure Privacy consent banner — loads first so it can gate cookies/trackers for EU visitors */}
         <Script
@@ -81,15 +96,6 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-XJL3T2WE7B');`}
         </Script>
-        {ADSENSE_CLIENT && (
-          <Script
-            id="adsense"
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        )}
       </body>
     </html>
   );
