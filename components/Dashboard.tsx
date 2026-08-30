@@ -333,6 +333,11 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
           <section className="block">
             <div className="kicker">
               <h2 className="kicker-label">Currencies &amp; Commodities</h2>
+              <span className="kicker-note">
+                <Link className="statline-link" href="/convert/usd-to-krw">
+                  Currency converter →
+                </Link>
+              </span>
             </div>
             <div className="board">
               {[...fx, ...commodities].map((q) => (

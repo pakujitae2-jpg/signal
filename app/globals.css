@@ -527,6 +527,74 @@ table.mkt tbody tr:hover td {
   padding: 1px 6px;
 }
 
+/* ---------- FX converter ---------- */
+.fx-converter {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.fx-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+  padding: 10px 14px;
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.fx-field:focus-within {
+  border-color: var(--ink);
+}
+
+.fx-cur {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+}
+
+.fx-field input {
+  border: none;
+  background: none;
+  outline: none;
+  width: 100%;
+  font: inherit;
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  text-align: right;
+}
+
+.fx-eq {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.pair-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pair-link {
+  font-size: 12.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding: 5px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+}
+
+.pair-link:hover {
+  border-color: var(--ink);
+}
+
 /* ---------- Colophon ---------- */
 .colophon {
   border-top: 2px solid var(--ink);

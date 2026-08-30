@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { FX_SLUGS } from "@/lib/fx";
 import { POPULAR_SYMBOLS } from "@/lib/popular";
 import { SITE_URL } from "@/lib/site";
 
@@ -18,6 +19,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${SITE_URL}/markets/${region}`,
       changeFrequency: "hourly" as const,
       priority: 0.9,
+    })),
+    ...FX_SLUGS.map((slug) => ({
+      url: `${SITE_URL}/convert/${slug}`,
+      changeFrequency: "hourly" as const,
+      priority: 0.8,
     })),
     ...POPULAR_SYMBOLS.map((symbol) => ({
       url: `${SITE_URL}/quote/${encodeURIComponent(symbol)}`,

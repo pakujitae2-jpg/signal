@@ -5,7 +5,7 @@
 // automatically beneath the module.
 
 export type Affiliate = {
-  category: "Crypto Exchanges" | "Brokerages" | "Tools & Research";
+  category: "Crypto Exchanges" | "Brokerages" | "Tools & Research" | "Money Transfer";
   name: string;
   desc: string;
   url: string;
@@ -53,6 +53,18 @@ export const AFFILIATES: Affiliate[] = [
     name: "Ledger",
     desc: "Hardware wallets for keeping crypto in cold storage.",
     url: "https://example.com/your-ledger-affiliate",
+  },
+  {
+    category: "Money Transfer",
+    name: "Wise",
+    desc: "Send money abroad at the mid-market rate with low fees.",
+    url: "https://example.com/your-wise-affiliate",
+  },
+  {
+    category: "Money Transfer",
+    name: "Revolut",
+    desc: "Multi-currency account and card for travel and transfers.",
+    url: "https://example.com/your-revolut-affiliate",
   },
 ];
 
