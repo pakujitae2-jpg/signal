@@ -21,7 +21,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        {/* Secure Privacy consent banner — loads first so it can gate cookies/trackers for EU visitors */}
+        <Script
+          id="secure-privacy"
+          src="https://app.secureprivacy.ai/script/6a943777c62d5b186f64a970.js"
+          strategy="beforeInteractive"
+        />
         {children}
+        {/* Google Analytics (gtag.js) */}
+        <Script id="ga-lib" async src="https://www.googletagmanager.com/gtag/js?id=G-XJL3T2WE7B" strategy="afterInteractive" />
+        <Script id="ga-init" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XJL3T2WE7B');`}
+        </Script>
         {ADSENSE_CLIENT && (
           <Script
             id="adsense"
