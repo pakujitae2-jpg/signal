@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import type { HomeCopy } from "@/lib/home-copy";
 import type { CryptoCoin, MarketData, NewsItem, Quote } from "@/lib/types";
 import { fmtAgo, fmtCompactUsd, fmtDate, fmtNum, fmtSigned, fmtTime } from "@/lib/format";
 import { useCryptoStream, type LiveTick } from "@/lib/useCryptoStream";
@@ -11,8 +12,23 @@ import RakutenAd from "./RakutenAd";
 
 const REFRESH_MS = 30_000;
 
-function quoteHref(symbol: string): string {
-  return `/quote/${encodeURIComponent(symbol)}`;
+// Localized symbol names and the locale path prefix arrive from the server:
+// importing the 550-entry name table into this client bundle would ship it to
+// every visitor.
+type Ctx = { t: HomeCopy; p: string; names: Record<string, string> };
+
+const Ctx = createContext<Ctx>({ t: {} as HomeCopy, p: "", names: {} });
+const useCtx = () => useContext(Ctx);
+
+function useQuoteHref() {
+  const { p } = useCtx();
+  return (symbol: string) => `${p}/quote/${encodeURIComponent(symbol)}`;
+}
+
+/** Localized name for a symbol, falling back to the feed's own name. */
+function useName() {
+  const { names } = useCtx();
+  return (symbol: string, fallback: string) => names[symbol] ?? fallback;
 }
 
 /* ---------- Change value (arrow + sign accompany color, so direction never relies on color alone) ---------- */
@@ -59,6 +75,9 @@ function Sparkline({ data, pct, w = 76, h = 26 }: { data?: number[]; pct: number
 /* ---------- Pieces ---------- */
 
 function EquitiesBlock({ title, venue, index, stocks }: { title: string; venue: string; index?: Quote; stocks: Quote[] }) {
+  const { t } = useCtx();
+  const quoteHref = useQuoteHref();
+  const name = useName();
   return (
     <div className="mkt-block">
       <div className="mkt-head">
@@ -76,10 +95,10 @@ function EquitiesBlock({ title, venue, index, stocks }: { title: string; venue: 
         <table className="mkt">
           <thead>
             <tr>
-              <th>Company</th>
-              <th>Last</th>
-              <th>Chg</th>
-              <th>% Chg</th>
+              <th>{t.colCompany}</th>
+              <th>{t.colLast}</th>
+              <th>{t.colChg}</th>
+              <th>{t.colChgPct}</th>
             </tr>
           </thead>
           <tbody>
@@ -87,7 +106,7 @@ function EquitiesBlock({ title, venue, index, stocks }: { title: string; venue: 
               <tr key={q.symbol}>
                 <td>
                   <Link className="qlink" href={quoteHref(q.symbol)}>
-                    <span className="cell-name">{q.name}</span>
+                    <span className="cell-name">{name(q.symbol, q.name)}</span>
                     <span className="sym">{q.symbol.replace(/\.(KS|T)$/, "")}</span>
                   </Link>
                 </td>
@@ -106,16 +125,19 @@ function EquitiesBlock({ title, venue, index, stocks }: { title: string; venue: 
 }
 
 function CryptoTable({ coins, live }: { coins: CryptoCoin[]; live: Record<string, LiveTick> }) {
+  const { t } = useCtx();
+  const quoteHref = useQuoteHref();
+  const name = useName();
   return (
     <div className="table-scroll">
       <table className="mkt">
         <thead>
           <tr>
             <th>#</th>
-            <th style={{ textAlign: "left" }}>Name</th>
-            <th>Price</th>
+            <th style={{ textAlign: "left" }}>{t.colName}</th>
+            <th>{t.colPrice}</th>
             <th>24h</th>
-            <th>Mkt Cap</th>
+            <th>{t.colMktCap}</th>
             <th>7d</th>
           </tr>
         </thead>
@@ -129,7 +151,7 @@ function CryptoTable({ coins, live }: { coins: CryptoCoin[]; live: Record<string
                 <td style={{ textAlign: "left", color: "var(--ink-3)" }}>{coin.rank}</td>
                 <td style={{ textAlign: "left" }}>
                   <Link className="qlink" href={quoteHref(`${coin.symbol}-USD`)}>
-                    <span className="cell-name">{coin.name}</span>
+                    <span className="cell-name">{name(`${coin.symbol}-USD`, coin.name)}</span>
                     <span className="sym">{coin.symbol}</span>
                   </Link>
                 </td>
@@ -157,15 +179,26 @@ function CryptoTable({ coins, live }: { coins: CryptoCoin[]; live: Record<string
   );
 }
 
-const NEWS_CAT_LABEL: Record<NewsItem["category"], string> = {
-  crypto: "Crypto",
-  stock: "Markets",
-  economy: "Economy",
-};
+function newsCatLabel(t: HomeCopy, cat: NewsItem["category"]): string {
+  return cat === "crypto" ? t.newsCatCrypto : cat === "stock" ? t.newsCatStock : t.newsCatEconomy;
+}
 
 /* ---------- Front page ---------- */
 
-export default function Dashboard({ initialData }: { initialData: MarketData }) {
+export default function Dashboard({
+  initialData,
+  t,
+  lang,
+  names,
+}: {
+  initialData: MarketData;
+  t: HomeCopy;
+  lang: string;
+  names: Record<string, string>;
+}) {
+  const p = lang === "en" ? "" : `/${lang}`;
+  const quoteHref = (symbol: string) => `${p}/quote/${encodeURIComponent(symbol)}`;
+  const name = (symbol: string, fallback: string) => names[symbol] ?? fallback;
   const [data, setData] = useState<MarketData>(initialData);
   const [now, setNow] = useState<number | null>(null); // relative times render only after mount (hydration-safe)
   const { live, connected } = useCryptoStream(data.crypto);
@@ -206,14 +239,14 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
   const allIndices = [...regions.us.indices, ...regions.jp.indices, ...regions.kr.indices];
   const hasSample = Object.values(sources).includes("sample");
   const sampleParts = [
-    sources.quotes === "sample" && "market quotes",
-    sources.crypto === "sample" && "crypto prices",
-    sources.news === "sample" && "headlines",
+    sources.quotes === "sample" && t.samplePartQuotes,
+    sources.crypto === "sample" && t.samplePartCrypto,
+    sources.news === "sample" && t.samplePartNews,
   ].filter(Boolean);
 
   const tickerItems: { key: string; name: string; value: string; pct: number | null }[] = [
-    ...allIndices.map((q) => ({ key: q.symbol, name: q.name, value: fmtNum(q.price), pct: q.changePct })),
-    ...fx.map((q) => ({ key: q.symbol, name: q.name, value: fmtNum(q.price), pct: q.changePct })),
+    ...allIndices.map((q) => ({ key: q.symbol, name: name(q.symbol, q.name), value: fmtNum(q.price), pct: q.changePct })),
+    ...fx.map((q) => ({ key: q.symbol, name: name(q.symbol, q.name), value: fmtNum(q.price), pct: q.changePct })),
     ...crypto.slice(0, 2).map((coin) => {
       const tick = live[coin.symbol];
       return {
@@ -228,33 +261,35 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
   const partnerCategories = Array.from(new Set(AFFILIATES.map((p) => p.category)));
 
   return (
+    <Ctx.Provider value={{ t, p, names }}>
     <div className="paper">
       <header className="masthead">
         <h1 className="wordmark">PNL<span className="wm-404">404</span></h1>
-        <p className="tagline">Profit Not Found — Global Markets, One Page</p>
+        <p className="tagline">{t.tagline}</p>
       </header>
 
       <div className="dateline">
         <span>{fmtDate(data.updatedAt)}</span>
         <span className="dateline-status">
           <span className={`status-dot${hasSample ? " sample" : ""}`} aria-hidden="true" />
-          Updated {fmtTime(data.updatedAt)} UTC{now !== null && ` · ${fmtAgo(data.updatedAt, now)}`}
+          {t.updated.replace("{time}", fmtTime(data.updatedAt))}
+          {now !== null && ` · ${fmtAgo(data.updatedAt, now)}`}
         </span>
       </div>
 
-      <nav className="topnav" aria-label="Markets">
-        <Link href="/markets/us">U.S.</Link>
-        <Link href="/markets/japan">Japan</Link>
-        <Link href="/markets/korea">Korea</Link>
-        <Link href="/markets/crypto">Crypto</Link>
-        <Link href="/kimchi-premium">Kimchi Premium</Link>
-        <Link href="/fear-greed">Fear &amp; Greed</Link>
-        <Link href="/convert">Currencies</Link>
-        <Link href="/movers">Movers</Link>
-        <Link href="/compare">Compare</Link>
-        <Link href="/tools/invested">If I Had Invested</Link>
-        <Link href="/quotes">All Quotes</Link>
-        <Link href="/search">Search</Link>
+      <nav className="topnav" aria-label={t.navAria}>
+        <Link href={`${p}/markets/us`}>{t.navUs}</Link>
+        <Link href={`${p}/markets/japan`}>{t.navJapan}</Link>
+        <Link href={`${p}/markets/korea`}>{t.navKorea}</Link>
+        <Link href={`${p}/markets/crypto`}>{t.navCrypto}</Link>
+        <Link href={`${p}/kimchi-premium`}>{t.navKimchi}</Link>
+        <Link href={`${p}/fear-greed`}>{t.navFearGreed}</Link>
+        <Link href={`${p}/convert`}>{t.navCurrencies}</Link>
+        <Link href={`${p}/movers`}>{t.navMovers}</Link>
+        <Link href={`${p}/compare`}>{t.navCompare}</Link>
+        <Link href={`${p}/tools/invested`}>{t.navInvested}</Link>
+        <Link href={`${p}/quotes`}>{t.navQuotes}</Link>
+        <Link href={`${p}/search`}>{t.navSearch}</Link>
       </nav>
 
       <div className="ticker-wrap" aria-hidden="true">
@@ -270,10 +305,7 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
       </div>
 
       {hasSample && (
-        <p className="wire-note">
-          Note: {sampleParts.join(", ")} shown here are sample figures — live feeds connect automatically in
-          production deployments.
-        </p>
+        <p className="wire-note">{t.sampleNote.replace("{parts}", sampleParts.join(", "))}</p>
       )}
 
       <AdSlot slot="0000000001" format="leaderboard" />
@@ -282,13 +314,13 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
         <main className="col-main">
           <section className="block">
             <div className="kicker">
-              <h2 className="kicker-label">Markets at a Glance</h2>
+              <h2 className="kicker-label">{t.glanceHeading}</h2>
               <span className="kicker-note">US · Japan · Korea benchmarks</span>
             </div>
             <div className="board">
               {allIndices.map((q) => (
                 <Link className="board-cell" key={q.symbol} href={quoteHref(q.symbol)}>
-                  <span className="b-name">{q.name}</span>
+                  <span className="b-name">{name(q.symbol, q.name)}</span>
                   <span className="b-value">{fmtNum(q.price)}</span>
                   <div className="b-foot">
                     <Chg pct={q.changePct} />
@@ -301,28 +333,28 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
 
           <section className="block">
             <div className="kicker">
-              <h2 className="kicker-label">Cryptocurrencies</h2>
+              <h2 className="kicker-label">{t.cryptoHeading}</h2>
               <span className="kicker-note">
                 {connected ? (
                   <>
-                    <span className="live-badge">● LIVE</span> · streaming tick-by-tick
+                    <span className="live-badge">● LIVE</span> · {t.cryptoLiveNote}
                   </>
                 ) : (
-                  "Top 10 by market cap · 24/7"
+                  t.cryptoStaticNote
                 )}
               </span>
             </div>
             {cryptoGlobal && (
               <p className="statline">
-                Total market cap <b>{fmtCompactUsd(cryptoGlobal.totalMarketCapUsd)}</b>{" "}
-                <Chg pct={cryptoGlobal.changePct24h} /> (24h) · Bitcoin dominance{" "}
+                {t.totalMarketCap} <b>{fmtCompactUsd(cryptoGlobal.totalMarketCapUsd)}</b>{" "}
+                <Chg pct={cryptoGlobal.changePct24h} /> {t.change24h} · {t.btcDominance}{" "}
                 <b>{cryptoGlobal.btcDominance.toFixed(1)}%</b> ·{" "}
-                <Link className="statline-link" href="/kimchi-premium">
-                  Kimchi premium
+                <Link className="statline-link" href={`${p}/kimchi-premium`}>
+                  {t.kimchiLink}
                 </Link>{" "}
                 ·{" "}
-                <Link className="statline-link" href="/fear-greed">
-                  Fear &amp; Greed →
+                <Link className="statline-link" href={`${p}/fear-greed`}>
+                  {t.fearGreedLink} →
                 </Link>
               </p>
             )}
@@ -331,29 +363,29 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
 
           <section className="block">
             <div className="kicker">
-              <h2 className="kicker-label">Equities</h2>
-              <span className="kicker-note">Large caps by market</span>
+              <h2 className="kicker-label">{t.equitiesHeading}</h2>
+              <span className="kicker-note">{t.equitiesNote}</span>
             </div>
-            <EquitiesBlock title="United States" venue="NYSE · Nasdaq" index={regions.us.indices[0]} stocks={regions.us.stocks} />
-            <EquitiesBlock title="Japan" venue="Tokyo Stock Exchange" index={regions.jp.indices[0]} stocks={regions.jp.stocks} />
-            <EquitiesBlock title="South Korea" venue="Korea Exchange" index={regions.kr.indices[0]} stocks={regions.kr.stocks} />
+            <EquitiesBlock title={t.regionUsTitle} venue={t.regionUsVenue} index={regions.us.indices[0]} stocks={regions.us.stocks} />
+            <EquitiesBlock title={t.regionJapanTitle} venue={t.regionJapanVenue} index={regions.jp.indices[0]} stocks={regions.jp.stocks} />
+            <EquitiesBlock title={t.regionKoreaTitle} venue={t.regionKoreaVenue} index={regions.kr.indices[0]} stocks={regions.kr.stocks} />
           </section>
 
           <RakutenAd />
 
           <section className="block">
             <div className="kicker">
-              <h2 className="kicker-label">Currencies &amp; Commodities</h2>
+              <h2 className="kicker-label">{t.fxHeading}</h2>
               <span className="kicker-note">
-                <Link className="statline-link" href="/convert/usd-to-krw">
-                  Currency converter →
+                <Link className="statline-link" href={`${p}/convert`}>
+                  {t.fxNote} →
                 </Link>
               </span>
             </div>
             <div className="board">
               {[...fx, ...commodities].map((q) => (
                 <Link className="board-cell" key={q.symbol} href={quoteHref(q.symbol)}>
-                  <span className="b-name">{q.name}</span>
+                  <span className="b-name">{name(q.symbol, q.name)}</span>
                   <span className="b-value">{fmtNum(q.price, q.symbol.endsWith("=F") ? q.currency : undefined)}</span>
                   <div className="b-foot">
                     <Chg pct={q.changePct} />
@@ -368,14 +400,14 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
         <aside className="col-rail">
           <section className="rail-mod">
             <div className="kicker">
-              <h2 className="kicker-label">Latest Headlines</h2>
+              <h2 className="kicker-label">{t.newsHeading}</h2>
             </div>
             <div className="news-list">
               {news.map((item, i) => (
                 <a className="news-item" key={`${item.link}-${i}`} href={item.link} target="_blank" rel="noopener noreferrer">
                   <span className="news-title">{item.title}</span>
                   <span className="news-meta">
-                    {NEWS_CAT_LABEL[item.category]} · {item.source} ·{" "}
+                    {newsCatLabel(t, item.category)} · {item.source} ·{" "}
                     {now !== null ? fmtAgo(item.publishedAt, now) : `${fmtTime(item.publishedAt)} UTC`}
                   </span>
                 </a>
@@ -387,7 +419,7 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
 
           <section className="rail-mod">
             <div className="kicker">
-              <h2 className="kicker-label">Where to Trade</h2>
+              <h2 className="kicker-label">{t.tradeHeading}</h2>
             </div>
             {partnerCategories.map((cat) => (
               <div key={cat}>
@@ -422,5 +454,6 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
         <p className="fine">© {new Date().getFullYear()} PNL404</p>
       </footer>
     </div>
+    </Ctx.Provider>
   );
 }

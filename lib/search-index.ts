@@ -1,4 +1,5 @@
 import { COMPARE_PAIRS } from "./compare";
+import { PULSE_LINKS, pulseText } from "./pulse";
 import { CURRENCIES, MAJOR, pairSlug } from "./fx";
 import { prefix, curName, type Lang } from "./i18n";
 import { localName } from "./names";
@@ -109,6 +110,17 @@ export function buildSearchIndex(lang: Lang): SearchEntry[] {
         x: `${b} ${qc} ${curName(lang, b)} ${curName(lang, qc)} rate`.toLowerCase(),
       });
     }
+  }
+
+  for (const entry of PULSE_LINKS) {
+    const text = pulseText(lang, entry.slug);
+    if (!text) continue;
+    out.push({
+      h: `${p}/pulse/${entry.slug}`,
+      t: text.query,
+      k: text.kicker,
+      x: `${entry.slug} ${text.kicker}`.toLowerCase(),
+    });
   }
 
   for (const pair of COMPARE_PAIRS) {

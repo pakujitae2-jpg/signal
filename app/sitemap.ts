@@ -1,16 +1,18 @@
 import type { MetadataRoute } from "next";
 import { COMPARE_SLUGS } from "@/lib/compare";
+import { PULSE_SLUGS } from "@/lib/pulse";
 import { CURRENCY_CODES, FX_SLUGS } from "@/lib/fx";
 import { POPULAR_SYMBOLS } from "@/lib/popular";
 import { SITE_URL } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
-    {
-      url: `${SITE_URL}/`,
-      changeFrequency: "hourly",
-      priority: 1,
-    },
+    // The front page exists in every locale.
+    ...["", "/ko", "/ja"].map((p) => ({
+      url: `${SITE_URL}${p || "/"}`,
+      changeFrequency: "hourly" as const,
+      priority: p === "" ? 1 : 0.9,
+    })),
     ...["", "/ko", "/ja"].flatMap((p) => [
       { url: `${SITE_URL}${p}/kimchi-premium`, changeFrequency: "hourly" as const, priority: 0.9 },
       { url: `${SITE_URL}${p}/fear-greed`, changeFrequency: "daily" as const, priority: 0.9 },
@@ -18,6 +20,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       { url: `${SITE_URL}${p}/compare`, changeFrequency: "weekly" as const, priority: 0.8 },
       { url: `${SITE_URL}${p}/tools/invested`, changeFrequency: "weekly" as const, priority: 0.8 },
       { url: `${SITE_URL}${p}/widget`, changeFrequency: "monthly" as const, priority: 0.6 },
+      { url: `${SITE_URL}${p}/pulse`, changeFrequency: "weekly" as const, priority: 0.8 },
+      ...PULSE_SLUGS.map((slug) => ({
+        url: `${SITE_URL}${p}/pulse/${slug}`,
+        changeFrequency: "daily" as const,
+        priority: 0.8,
+      })),
       // Head-to-head pages exist in every locale.
       ...COMPARE_SLUGS.map((slug) => ({
         url: `${SITE_URL}${p}/compare/${slug}`,
