@@ -74,8 +74,8 @@ export default async function OgImage({ params }: { params: Promise<{ symbol: st
           <div style={{ height: h, display: "flex" }} />
         )}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 26 }}>
-          <span style={{ fontWeight: 700, letterSpacing: "0.12em" }}>SIGNAL</span>
-          <span style={{ color: "#55524a" }}>Live chart &amp; key stats — global markets, one page</span>
+          <span style={{ display: "flex", fontWeight: 700, letterSpacing: "0.12em" }}>PNL<span style={{ color: "#c62828" }}>404</span></span>
+          <span style={{ color: "#55524a" }}>Live chart &amp; key stats — profit not found</span>
         </div>
       </div>
     ),

@@ -79,13 +79,13 @@ type Props = { params: Promise<{ region: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { region } = await params;
   const conf = REGIONS[region as RegionKey];
-  if (!conf) return { title: "Signal" };
+  if (!conf) return { title: "PNL404" };
   const canonical = `/markets/${region}`;
   return {
     title: conf.title,
     description: conf.description,
     alternates: { canonical },
-    openGraph: { type: "website", siteName: "Signal", title: conf.title, description: conf.description, url: canonical },
+    openGraph: { type: "website", siteName: "PNL404", title: conf.title, description: conf.description, url: canonical },
     twitter: { card: "summary_large_image", title: conf.title, description: conf.description },
   };
 }
@@ -179,9 +179,9 @@ export default async function MarketPage({ params }: Props) {
     <div className="paper">
       <header className="subhead">
         <Link className="crumb" href="/">
-          ← SIGNAL
+          ← PNL404
         </Link>
-        <span className="subhead-note">Global markets, one page</span>
+        <span className="subhead-note">Profit Not Found</span>
       </header>
 
       <div className="quote-head">
@@ -292,7 +292,7 @@ export default async function MarketPage({ params }: Props) {
 
       <footer className="colophon">
         <p className="fine">
-          Market data may be delayed and is provided for information only, not investment advice. © {new Date().getFullYear()} Signal
+          Market data may be delayed and is provided for information only, not investment advice. © {new Date().getFullYear()} PNL404
         </p>
       </footer>
     </div>

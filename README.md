@@ -1,4 +1,6 @@
-# SIGNAL — Global Markets, One Page
+# PNL404 — Profit Not Found
+
+> **PnL** (Profit & Loss) + **404 Not Found** = `pnl404.com`. 개발자가 장난으로 만든 블룸버그 컨셉 — 데이터는 진지하게, 목소리는 밈으로.
 
 **해외(영어권) 이용자 타깃**의 종합 금융정보 사이트입니다. 미국·일본·한국 주식, 암호화폐, 환율, 원자재, 뉴스 헤드라인을 신문 스타일의 한 페이지에서 보여줍니다.
 
@@ -62,7 +64,7 @@ npm start          # 프로덕션 서버
 ### 1. Google AdSense (디스플레이 광고)
 
 1. [AdSense](https://adsense.google.com) 가입 후 사이트 승인 → `ca-pub-...` 클라이언트 ID 발급
-2. Vercel 프로젝트 → Settings → Environment Variables에 `NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-XXXXXXXX` 추가 후 재배포
+2. Cloudflare Worker 빌드 변수(또는 Vercel 환경변수)에 `NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-XXXXXXXX` 추가 후 재배포
 3. `components/Dashboard.tsx`의 `<AdSlot slot="..." />` 두 곳에 광고 단위 ID 입력
 
 환경변수가 없으면 "Advertisement" 라벨의 예약 공간이 유지되므로 승인 전에도 레이아웃이 흔들리지 않습니다.

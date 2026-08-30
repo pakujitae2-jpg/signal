@@ -6,27 +6,27 @@ import "./globals.css";
 const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
 const DESCRIPTION =
-  "Live prices for US, Japanese and Korean stocks, top cryptocurrencies, currencies and commodities — with the latest market headlines, on a single page.";
+  "Live US, Japanese and Korean stocks, top cryptocurrencies, FX and commodities — with the latest market headlines, on a single page. Profit not found; everything else is.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Signal · Global Markets at a Glance",
-    template: "%s · Signal",
+    default: "PNL404 — Global Markets, One Page",
+    template: "%s · PNL404",
   },
   description: DESCRIPTION,
-  keywords: ["stocks", "crypto", "bitcoin", "S&P 500", "Nikkei", "KOSPI", "markets", "prices", "forex"],
+  keywords: ["pnl404", "stocks", "crypto", "bitcoin", "S&P 500", "Nikkei", "KOSPI", "markets", "prices", "forex"],
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    siteName: "Signal",
-    title: "Signal · Global Markets at a Glance",
+    siteName: "PNL404",
+    title: "PNL404 — Global Markets, One Page",
     description: DESCRIPTION,
     url: "/",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Signal · Global Markets at a Glance",
+    title: "PNL404 — Global Markets, One Page",
     description: DESCRIPTION,
   },
   robots: { index: true, follow: true },

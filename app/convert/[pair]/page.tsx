@@ -22,7 +22,7 @@ type Props = { params: Promise<{ pair: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { pair } = await params;
   const parsed = parseSlug(pair);
-  if (!parsed) return { title: "Signal" };
+  if (!parsed) return { title: "PNL404" };
   const { base, quote } = parsed;
   const fx = await getFxRate(base, quote, "1mo");
   const title = `${base} to ${quote} Exchange Rate`;
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     alternates: { canonical },
-    openGraph: { type: "website", siteName: "Signal", title, description, url: canonical },
+    openGraph: { type: "website", siteName: "PNL404", title, description, url: canonical },
     twitter: { card: "summary_large_image", title, description },
   };
 }
@@ -76,8 +76,8 @@ export default async function ConvertPage({ params }: Props) {
   return (
     <div className="paper">
       <header className="subhead">
-        <Link className="crumb" href="/">← SIGNAL</Link>
-        <span className="subhead-note">Global markets, one page</span>
+        <Link className="crumb" href="/">← PNL404</Link>
+        <span className="subhead-note">Profit Not Found</span>
       </header>
 
       <div className="quote-head">
@@ -209,7 +209,7 @@ export default async function ConvertPage({ params }: Props) {
 
       <footer className="colophon">
         <p className="fine">
-          Rates are mid-market, may be delayed, and are provided for information only. © {new Date().getFullYear()} Signal
+          Rates are mid-market, may be delayed, and are provided for information only. © {new Date().getFullYear()} PNL404
         </p>
       </footer>
     </div>

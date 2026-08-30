@@ -15,19 +15,19 @@ type Props = { params: Promise<{ symbol: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { symbol: raw } = await params;
   const symbol = decodeURIComponent(raw);
-  if (!isValidSymbol(symbol)) return { title: "Signal" };
+  if (!isValidSymbol(symbol)) return { title: "PNL404" };
   const detail = await getQuoteDetail(symbol, "1d");
   const name = detail?.name ?? symbol;
   const sym = displaySymbol(symbol);
   const isCrypto = symbol.toUpperCase().endsWith("-USD");
   const title = isCrypto ? `${name} (${sym.replace(/-USD$/i, "")}) Price & Live Chart` : `${name} (${sym}) Stock Price & Live Chart`;
-  const description = `${name} live price, interactive chart, daily change and key stats — updated continuously on Signal, global markets on one page.`;
+  const description = `${name} live price, interactive chart, daily change and key stats — updated continuously on PNL404 — global markets, one page.`;
   const canonical = `/quote/${encodeURIComponent(symbol)}`;
   return {
     title,
     description,
     alternates: { canonical },
-    openGraph: { type: "website", siteName: "Signal", title, description, url: canonical },
+    openGraph: { type: "website", siteName: "PNL404", title, description, url: canonical },
     twitter: { card: "summary_large_image", title, description },
   };
 }
@@ -42,9 +42,9 @@ export default async function QuotePage({ params }: Props) {
     <div className="paper">
       <header className="subhead">
         <Link className="crumb" href="/">
-          ← SIGNAL
+          ← PNL404
         </Link>
-        <span className="subhead-note">Global markets, one page</span>
+        <span className="subhead-note">Profit Not Found</span>
       </header>
 
       {initial ? (
@@ -65,7 +65,7 @@ export default async function QuotePage({ params }: Props) {
 
       <footer className="colophon">
         <p className="fine">
-          Market data may be delayed and is provided for information only, not investment advice. © {new Date().getFullYear()} Signal
+          Market data may be delayed and is provided for information only, not investment advice. © {new Date().getFullYear()} PNL404
         </p>
       </footer>
     </div>

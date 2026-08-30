@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "Signal — Global Markets at a Glance";
+export const alt = "PNL404 — Profit Not Found";
 
 export default function OgImage() {
   return new ImageResponse(
@@ -21,9 +21,12 @@ export default function OgImage() {
         }}
       >
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 84, fontWeight: 700, letterSpacing: "0.14em" }}>SIGNAL</div>
+          <div style={{ display: "flex", fontSize: 92, fontWeight: 700, letterSpacing: "0.1em" }}>
+            <span>PNL</span>
+            <span style={{ color: "#c62828" }}>404</span>
+          </div>
           <div style={{ fontSize: 30, color: "#55524a", marginTop: 16, letterSpacing: "0.06em" }}>
-            GLOBAL MARKETS, ONE PAGE — STOCKS · CRYPTO · FX
+            PROFIT NOT FOUND — GLOBAL MARKETS, ONE PAGE
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 18 }}>

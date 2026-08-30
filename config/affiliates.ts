@@ -69,4 +69,4 @@ export const AFFILIATES: Affiliate[] = [
 ];
 
 export const AFFILIATE_DISCLOSURE =
-  "Some links above are referral or affiliate links. Signal may earn a commission when you sign up through them, at no additional cost to you.";
+  "Some links above are referral or affiliate links. PNL404 may earn a commission when you sign up through them, at no additional cost to you.";

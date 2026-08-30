@@ -230,8 +230,8 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
   return (
     <div className="paper">
       <header className="masthead">
-        <h1 className="wordmark">SIGNAL</h1>
-        <p className="tagline">Global markets, one page — Stocks · Crypto · FX</p>
+        <h1 className="wordmark">PNL<span className="wm-404">404</span></h1>
+        <p className="tagline">Profit Not Found — Global Markets, One Page</p>
       </header>
 
       <div className="dateline">
@@ -401,14 +401,14 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
 
       <footer className="colophon">
         <p>
-          <b>Signal</b> — US, Japanese and Korean equities, cryptocurrencies, currencies and commodities on a single
-          page. Crypto streams live; other prices refresh every 30 seconds.
+          <b>PNL404</b> — US, Japanese and Korean equities, crypto, FX and commodities on one page. Crypto streams
+          live; everything else refreshes every 30 seconds. The prices are real — the profits are 404.
         </p>
         <p className="fine">
           Market data may be delayed and is provided for information only, not investment advice. Sources: Yahoo
           Finance, CoinGecko, Binance stream, publisher RSS feeds.
         </p>
-        <p className="fine">© {new Date().getFullYear()} Signal</p>
+        <p className="fine">© {new Date().getFullYear()} PNL404</p>
       </footer>
     </div>
   );

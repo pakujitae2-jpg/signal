@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/kimchi-premium" },
   openGraph: {
     type: "website",
-    siteName: "Signal",
+    siteName: "PNL404",
     title: "Kimchi Premium Tracker",
     description: DESCRIPTION,
     url: "/kimchi-premium",
@@ -32,9 +32,9 @@ export default async function KimchiPage() {
     <div className="paper">
       <header className="subhead">
         <Link className="crumb" href="/">
-          ← SIGNAL
+          ← PNL404
         </Link>
-        <span className="subhead-note">Global markets, one page</span>
+        <span className="subhead-note">Profit Not Found</span>
       </header>
 
       <KimchiView initial={initial} />
@@ -92,7 +92,7 @@ export default async function KimchiPage() {
 
       <footer className="colophon">
         <p className="fine">
-          Market data may be delayed and is provided for information only, not investment advice. © {new Date().getFullYear()} Signal
+          Market data may be delayed and is provided for information only, not investment advice. © {new Date().getFullYear()} PNL404
         </p>
       </footer>
     </div>
