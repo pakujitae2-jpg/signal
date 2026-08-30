@@ -27,7 +27,7 @@ npm start          # 프로덕션 서버
 **Git 연동 (권장 — 푸시할 때마다 자동 배포):**
 1. Cloudflare 대시보드 → **Workers & Pages** → **Create** → **Workers** 탭 → **Import a repository**
 2. GitHub 연결 후 이 저장소(`signal`) 선택
-3. 빌드 명령: `npx opennextjs-cloudflare build` / 배포 명령: `npx opennextjs-cloudflare deploy` (wrangler.jsonc 자동 인식)
+3. 빌드/배포 명령은 기본값(`npm run build` + `npx wrangler deploy`) 그대로 두면 됩니다 — `npm run build`가 OpenNext 번들(`.open-next/worker.js`)까지 생성하고, wrangler가 `wrangler.jsonc`를 자동 인식합니다. Node 버전은 `.node-version`(22.16.0)을 따릅니다 (wrangler는 Node 22 이상 필요)
 4. 배포되면 `signal.<계정>.workers.dev` 주소가 생기고, Worker → Settings → **Domains & Routes**에서 커스텀 도메인을 연결합니다 (도메인 DNS가 Cloudflare에 있으면 원클릭)
 5. 빌드 환경변수에 `NEXT_PUBLIC_SITE_URL=https://도메인` 추가 (캐노니컬·사이트맵 기준 주소)
 
