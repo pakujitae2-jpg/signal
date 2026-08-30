@@ -242,6 +242,14 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
         </span>
       </div>
 
+      <nav className="topnav" aria-label="Markets">
+        <Link href="/markets/us">U.S.</Link>
+        <Link href="/markets/japan">Japan</Link>
+        <Link href="/markets/korea">Korea</Link>
+        <Link href="/markets/crypto">Crypto</Link>
+        <Link href="/kimchi-premium">Kimchi Premium</Link>
+      </nav>
+
       <div className="ticker-wrap" aria-hidden="true">
         <div className="ticker">
           {[...tickerItems, ...tickerItems].map((item, i) => (

@@ -101,6 +101,24 @@ a {
   background: #b59a3e;
 }
 
+/* ---------- Section nav ---------- */
+.topnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  padding: 8px 2px;
+  border-bottom: 1px solid var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.topnav a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* ---------- Ticker ---------- */
 .ticker-wrap {
   overflow: hidden;

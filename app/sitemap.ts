@@ -14,6 +14,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "hourly",
       priority: 0.9,
     },
+    ...["us", "japan", "korea", "crypto"].map((region) => ({
+      url: `${SITE_URL}/markets/${region}`,
+      changeFrequency: "hourly" as const,
+      priority: 0.9,
+    })),
     ...POPULAR_SYMBOLS.map((symbol) => ({
       url: `${SITE_URL}/quote/${encodeURIComponent(symbol)}`,
       changeFrequency: "hourly" as const,
