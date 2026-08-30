@@ -18,9 +18,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!isValidSymbol(symbol)) return { title: "Signal" };
   const detail = await getQuoteDetail(symbol, "1d");
   const name = detail?.name ?? symbol;
+  const sym = displaySymbol(symbol);
+  const isCrypto = symbol.toUpperCase().endsWith("-USD");
+  const title = isCrypto ? `${name} (${sym.replace(/-USD$/i, "")}) Price & Live Chart` : `${name} (${sym}) Stock Price & Live Chart`;
+  const description = `${name} live price, interactive chart, daily change and key stats — updated continuously on Signal, global markets on one page.`;
+  const canonical = `/quote/${encodeURIComponent(symbol)}`;
   return {
-    title: `${name} (${displaySymbol(symbol)}) Price & Chart · Signal`,
-    description: `Live ${name} price, chart and key stats on Signal — global markets on a single page.`,
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: { type: "website", siteName: "Signal", title, description, url: canonical },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 

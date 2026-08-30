@@ -1,14 +1,35 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
+const DESCRIPTION =
+  "Live prices for US, Japanese and Korean stocks, top cryptocurrencies, currencies and commodities — with the latest market headlines, on a single page.";
+
 export const metadata: Metadata = {
-  title: "Signal · Global Markets at a Glance",
-  description:
-    "Live prices for US, Japanese and Korean stocks, top cryptocurrencies, currencies and commodities — with the latest market headlines, on a single page.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Signal · Global Markets at a Glance",
+    template: "%s · Signal",
+  },
+  description: DESCRIPTION,
   keywords: ["stocks", "crypto", "bitcoin", "S&P 500", "Nikkei", "KOSPI", "markets", "prices", "forex"],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "Signal",
+    title: "Signal · Global Markets at a Glance",
+    description: DESCRIPTION,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Signal · Global Markets at a Glance",
+    description: DESCRIPTION,
+  },
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
