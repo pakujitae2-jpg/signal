@@ -248,6 +248,7 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
         <Link href="/markets/korea">Korea</Link>
         <Link href="/markets/crypto">Crypto</Link>
         <Link href="/kimchi-premium">Kimchi Premium</Link>
+        <Link href="/fear-greed">Fear &amp; Greed</Link>
       </nav>
 
       <div className="ticker-wrap" aria-hidden="true">
@@ -311,7 +312,11 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
                 <Chg pct={cryptoGlobal.changePct24h} /> (24h) · Bitcoin dominance{" "}
                 <b>{cryptoGlobal.btcDominance.toFixed(1)}%</b> ·{" "}
                 <Link className="statline-link" href="/kimchi-premium">
-                  Kimchi premium →
+                  Kimchi premium
+                </Link>{" "}
+                ·{" "}
+                <Link className="statline-link" href="/fear-greed">
+                  Fear &amp; Greed →
                 </Link>
               </p>
             )}

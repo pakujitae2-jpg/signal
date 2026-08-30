@@ -15,6 +15,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "hourly",
       priority: 0.9,
     },
+    {
+      url: `${SITE_URL}/fear-greed`,
+      changeFrequency: "daily" as const,
+      priority: 0.9,
+    },
     ...["us", "japan", "korea", "crypto"].map((region) => ({
       url: `${SITE_URL}/markets/${region}`,
       changeFrequency: "hourly" as const,
