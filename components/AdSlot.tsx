@@ -1,29 +1,28 @@
 "use client";
 
 import { useEffect } from "react";
-
-const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+import { ADSENSE_CLIENT } from "@/lib/site";
 
 /**
- * Ad unit. When NEXT_PUBLIC_ADSENSE_CLIENT (e.g. ca-pub-XXXX) is set, a real
- * responsive AdSense unit renders; otherwise a quiet reserved space keeps the
- * layout stable, the way news sites reserve ad space before fill.
- * `slot` is the ad-unit ID issued by AdSense.
+ * Ad unit. With a real ad-unit ID a responsive AdSense unit renders;
+ * placeholder IDs (all zeros) keep a quiet reserved space so the layout
+ * stays stable while Auto ads (loaded in the root layout) fill the page.
  */
+const hasSlot = (slot: string) => !/^0+$/.test(slot);
 export default function AdSlot({ slot, format }: { slot: string; format: "leaderboard" | "rectangle" }) {
   useEffect(() => {
-    if (!ADSENSE_CLIENT) return;
+    if (!hasSlot(slot)) return;
     try {
       ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
     } catch {
       // Ad blockers may reject the push; the page continues fine.
     }
-  }, []);
+  }, [slot]);
 
   return (
     <div className={`ad-unit ad-${format}`} role="complementary" aria-label="Advertisement">
       <span className="ad-label">Advertisement</span>
-      {ADSENSE_CLIENT ? (
+      {hasSlot(slot) ? (
         <ins
           className="adsbygoogle"
           style={{ display: "block", width: "100%" }}

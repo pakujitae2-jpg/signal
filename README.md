@@ -65,7 +65,7 @@ npm start          # 프로덕션 서버
 ### 1. Google AdSense (디스플레이 광고)
 
 1. [AdSense](https://adsense.google.com) 가입 후 사이트 승인 → `ca-pub-...` 클라이언트 ID 발급
-2. Cloudflare Worker 빌드 변수(또는 Vercel 환경변수)에 `NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-XXXXXXXX` 추가 후 재배포
+2. 게시자 ID는 `lib/site.ts`의 `ADSENSE_CLIENT`에 있습니다 (환경변수 `NEXT_PUBLIC_ADSENSE_CLIENT`로 덮어쓰기 가능). Auto ads는 이것만으로 동작하고, `components/AdSlot.tsx`의 자리표시 슬롯(`0000…`)을 실제 광고 단위 ID로 바꾸면 수동 배치 단위도 렌더됩니다
 3. `components/Dashboard.tsx`의 `<AdSlot slot="..." />` 두 곳에 광고 단위 ID 입력
 
 환경변수가 없으면 "Advertisement" 라벨의 예약 공간이 유지되므로 승인 전에도 레이아웃이 흔들리지 않습니다.

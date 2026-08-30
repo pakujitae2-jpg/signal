@@ -1,10 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import JsonLd from "@/components/JsonLd";
-import { SITE_URL } from "@/lib/site";
+import { ADSENSE_CLIENT, SITE_URL } from "@/lib/site";
 import "./globals.css";
-
-const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
 const DESCRIPTION =
   "Live US, Japanese and Korean stocks, top cryptocurrencies, FX and commodities — with the latest market headlines, on a single page. Profit not found; everything else is.";
