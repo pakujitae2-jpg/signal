@@ -493,6 +493,26 @@ table.mkt tbody tr:hover td {
   color: var(--ink-3);
 }
 
+.ad-rakuten {
+  overflow: hidden;
+}
+
+.rakuten-frame {
+  display: block;
+  margin: 0 auto;
+  width: 468px;
+  height: 160px;
+  border: 0;
+}
+
+@media (max-width: 520px) {
+  .rakuten-frame {
+    transform: scale(0.75);
+    transform-origin: top center;
+    margin-bottom: -40px;
+  }
+}
+
 /* ---------- Links into quote pages ---------- */
 .board-cell {
   display: block;

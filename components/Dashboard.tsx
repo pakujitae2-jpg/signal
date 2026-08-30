@@ -7,6 +7,7 @@ import { fmtAgo, fmtCompactUsd, fmtDate, fmtNum, fmtSigned, fmtTime } from "@/li
 import { useCryptoStream, type LiveTick } from "@/lib/useCryptoStream";
 import { AFFILIATES, AFFILIATE_DISCLOSURE } from "@/config/affiliates";
 import AdSlot from "./AdSlot";
+import RakutenAd from "./RakutenAd";
 
 const REFRESH_MS = 30_000;
 
@@ -315,6 +316,8 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
             <EquitiesBlock title="Japan" venue="Tokyo Stock Exchange" index={regions.jp.indices[0]} stocks={regions.jp.stocks} />
             <EquitiesBlock title="South Korea" venue="Korea Exchange" index={regions.kr.indices[0]} stocks={regions.kr.stocks} />
           </section>
+
+          <RakutenAd />
 
           <section className="block">
             <div className="kicker">
