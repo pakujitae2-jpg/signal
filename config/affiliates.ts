@@ -16,7 +16,7 @@ export const AFFILIATES: Affiliate[] = [
     category: "Crypto Exchanges",
     name: "Binance",
     desc: "The world's largest crypto exchange. Fee discount for new sign-ups.",
-    url: "https://example.com/your-binance-referral",
+    url: "https://www.binance.com/register?ref=Z0QZG6TP",
   },
   {
     category: "Crypto Exchanges",
