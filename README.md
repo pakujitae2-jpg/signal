@@ -44,7 +44,8 @@ npm start          # 프로덕션 서버
 | 데이터 | 소스 | 비용 | 비고 |
 |---|---|---|---|
 | 미국·일본·한국 주식/지수/환율/원자재 | Yahoo Finance (비공식) | 무료 | 15~20분 지연 가능, 프로토타입용 |
-| 암호화폐 시세·시가총액 | CoinGecko 공개 API | 무료 | 키 불필요, 분당 호출 제한 있음 |
+| 암호화폐 시세·시가총액 | alternative.me (1차) · CoinGecko (폴백) | 무료 | CoinGecko는 Cloudflare 공유 IP에서 429가 잦아 2순위 |
+| 환율 폴백 | open.er-api.com (일별 환율) · Frankfurter (ECB 이력) | 무료 | Yahoo에 없는 통화쌍만 사용 |
 | 뉴스 | CoinDesk · Yahoo Finance · MarketWatch · CNBC · Nikkei Asia RSS | 무료 | `lib/symbols.ts`에서 피드 추가/변경 |
 
 종목 구성은 `lib/symbols.ts`에서 수정합니다 (심볼 추가만 하면 화면에 자동 반영).

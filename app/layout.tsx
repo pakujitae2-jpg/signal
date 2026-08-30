@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import JsonLd from "@/components/JsonLd";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
     template: "%s · PNL404",
   },
   description: DESCRIPTION,
-  keywords: ["pnl404", "stocks", "crypto", "bitcoin", "S&P 500", "Nikkei", "KOSPI", "markets", "prices", "forex"],
+  keywords: ["pnl404", "stocks", "crypto", "bitcoin", "S&P 500", "Nikkei", "KOSPI", "markets", "prices", "forex", "currency converter", "exchange rates"],
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
@@ -47,6 +48,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           id="secure-privacy"
           src="https://app.secureprivacy.ai/script/6a943777c62d5b186f64a970.js"
           strategy="beforeInteractive"
+        />
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "Organization",
+                "@id": `${SITE_URL}/#org`,
+                name: "PNL404",
+                url: `${SITE_URL}/`,
+                logo: `${SITE_URL}/icon.svg`,
+              },
+              {
+                "@type": "WebSite",
+                "@id": `${SITE_URL}/#site`,
+                name: "PNL404",
+                url: `${SITE_URL}/`,
+                description: DESCRIPTION,
+                publisher: { "@id": `${SITE_URL}/#org` },
+              },
+            ],
+          }}
         />
         {children}
         {/* Google Analytics (gtag.js) */}

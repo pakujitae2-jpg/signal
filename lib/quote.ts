@@ -1,10 +1,10 @@
 import { fetchJson } from "./http";
-import { SYMBOLS } from "./symbols";
+import { universeEntry } from "./universe";
 import { SAMPLE_CRYPTO, SAMPLE_QUOTES } from "./sample-data";
 
-export type Range = "1d" | "5d" | "1mo" | "6mo" | "1y";
-export const RANGES: Range[] = ["1d", "5d", "1mo", "6mo", "1y"];
-export const RANGE_LABEL: Record<Range, string> = { "1d": "1D", "5d": "5D", "1mo": "1M", "6mo": "6M", "1y": "1Y" };
+import type { Range } from "./ranges";
+
+export { RANGES, RANGE_LABEL, type Range } from "./ranges";
 
 const RANGE_INTERVAL: Record<Range, string> = { "1d": "5m", "5d": "30m", "1mo": "1d", "6mo": "1d", "1y": "1wk" };
 const RANGE_MS: Record<Range, number> = {
@@ -14,6 +14,8 @@ const RANGE_MS: Record<Range, number> = {
   "6mo": 182 * 24 * 3600_000,
   "1y": 365 * 24 * 3600_000,
 };
+// How long the edge may share one upstream response for each range.
+const RANGE_EDGE_TTL: Record<Range, number> = { "1d": 30, "5d": 120, "1mo": 600, "6mo": 1800, "1y": 3600 };
 
 export type QuoteDetail = {
   symbol: string;
@@ -72,20 +74,31 @@ export async function getQuoteDetail(symbol: string, range: Range): Promise<Quot
   if (hit && Date.now() - hit.ts < CACHE_TTL_MS) return hit.data;
 
   try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${RANGE_INTERVAL[range]}`;
-    const json = await fetchJson(url);
-    const r = json?.chart?.result?.[0];
-    if (!r) throw new Error("no result");
+    const chart = async (rng: string, interval: string, ttl: number) => {
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${rng}&interval=${interval}`;
+      const json = await fetchJson(url, ttl);
+      const r = json?.chart?.result?.[0];
+      if (!r) throw new Error("no result");
+      const ts: number[] = r.timestamp ?? [];
+      const closes: unknown[] = r.indicators?.quote?.[0]?.close ?? [];
+      const points = ts
+        .map((t, i) => ({ t: t * 1000, c: closes[i] }))
+        .filter((p): p is { t: number; c: number } => typeof p.c === "number" && isFinite(p.c));
+      return { meta: r.meta ?? {}, points };
+    };
 
-    const meta = r.meta ?? {};
-    const ts: number[] = r.timestamp ?? [];
-    const closes: unknown[] = r.indicators?.quote?.[0]?.close ?? [];
-    const points = ts
-      .map((t, i) => ({ t: t * 1000, c: closes[i] }))
-      .filter((p): p is { t: number; c: number } => typeof p.c === "number" && isFinite(p.c));
+    let { meta, points } = await chart(range, RANGE_INTERVAL[range], RANGE_EDGE_TTL[range]);
+    if (points.length < 2 && range === "1d") {
+      // Outside trading hours (weekends, holidays) a 1d request can come back
+      // nearly empty; show the last session from a wider window instead.
+      const wide = await chart("5d", "15m", 120);
+      const lastT = wide.points[wide.points.length - 1]?.t ?? 0;
+      meta = wide.meta;
+      points = wide.points.filter((p) => p.t >= lastT - 24 * 3600_000);
+    }
     if (points.length < 2) throw new Error("no points");
 
-    const fallbackName = SYMBOLS.find((s) => s.symbol === symbol)?.name;
+    const fallbackName = universeEntry(symbol)?.name;
     const data: QuoteDetail = {
       symbol,
       name: meta.shortName || meta.longName || fallbackName || symbol,

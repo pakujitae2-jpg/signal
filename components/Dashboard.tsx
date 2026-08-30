@@ -249,6 +249,8 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
         <Link href="/markets/crypto">Crypto</Link>
         <Link href="/kimchi-premium">Kimchi Premium</Link>
         <Link href="/fear-greed">Fear &amp; Greed</Link>
+        <Link href="/convert">Currencies</Link>
+        <Link href="/quotes">All Quotes</Link>
       </nav>
 
       <div className="ticker-wrap" aria-hidden="true">

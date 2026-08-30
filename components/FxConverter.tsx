@@ -9,9 +9,9 @@ function fmtAmt(v: number): string {
 }
 
 /** Two-way currency converter, seeded with the server-fetched rate. */
-export default function FxConverter({ base, quote, rate }: { base: string; quote: string; rate: number }) {
-  const [baseAmt, setBaseAmt] = useState("1");
-  const [quoteAmt, setQuoteAmt] = useState(fmtAmt(rate));
+export default function FxConverter({ base, quote, rate, initialAmount = 1 }: { base: string; quote: string; rate: number; initialAmount?: number }) {
+  const [baseAmt, setBaseAmt] = useState(fmtAmt(initialAmount));
+  const [quoteAmt, setQuoteAmt] = useState(fmtAmt(initialAmount * rate));
 
   function onBase(v: string) {
     setBaseAmt(v);

@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { AFFILIATES, AFFILIATE_DISCLOSURE } from "@/config/affiliates";
 import { fmtNum, fmtSigned } from "@/lib/format";
-import { RANGE_LABEL, RANGES, type QuoteDetail, type Range } from "@/lib/quote";
+import type { QuoteDetail } from "@/lib/quote";
+import { RANGE_LABEL, RANGES, type Range } from "@/lib/ranges";
 import AdSlot from "./AdSlot";
 
 /* ---------- helpers ---------- */
