@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { COMPARE_SLUGS } from "@/lib/compare";
 import { CURRENCY_CODES, FX_SLUGS } from "@/lib/fx";
 import { POPULAR_SYMBOLS } from "@/lib/popular";
 import { SITE_URL } from "@/lib/site";
@@ -13,6 +14,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...["", "/ko", "/ja"].flatMap((p) => [
       { url: `${SITE_URL}${p}/kimchi-premium`, changeFrequency: "hourly" as const, priority: 0.9 },
       { url: `${SITE_URL}${p}/fear-greed`, changeFrequency: "daily" as const, priority: 0.9 },
+      { url: `${SITE_URL}${p}/movers`, changeFrequency: "hourly" as const, priority: 0.9 },
+      { url: `${SITE_URL}${p}/compare`, changeFrequency: "weekly" as const, priority: 0.8 },
+      { url: `${SITE_URL}${p}/tools/invested`, changeFrequency: "weekly" as const, priority: 0.8 },
+      { url: `${SITE_URL}${p}/widget`, changeFrequency: "monthly" as const, priority: 0.6 },
+      // Head-to-head pages exist in every locale.
+      ...COMPARE_SLUGS.map((slug) => ({
+        url: `${SITE_URL}${p}/compare/${slug}`,
+        changeFrequency: "daily" as const,
+        priority: 0.7,
+      })),
     ]),
     ...["", "/ko", "/ja"].map((p) => ({
       url: `${SITE_URL}${p}/quotes`,

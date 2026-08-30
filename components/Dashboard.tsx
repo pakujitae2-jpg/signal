@@ -250,7 +250,11 @@ export default function Dashboard({ initialData }: { initialData: MarketData }) 
         <Link href="/kimchi-premium">Kimchi Premium</Link>
         <Link href="/fear-greed">Fear &amp; Greed</Link>
         <Link href="/convert">Currencies</Link>
+        <Link href="/movers">Movers</Link>
+        <Link href="/compare">Compare</Link>
+        <Link href="/tools/invested">If I Had Invested</Link>
         <Link href="/quotes">All Quotes</Link>
+        <Link href="/search">Search</Link>
       </nav>
 
       <div className="ticker-wrap" aria-hidden="true">

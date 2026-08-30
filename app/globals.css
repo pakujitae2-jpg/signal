@@ -960,3 +960,105 @@ a.mkt-idx:hover b {
     font-size: 19px;
   }
 }
+
+/* ---------- Ported desk features: compare, movers, widget, search ---------- */
+
+/* Embeddable ticker strip (/embed) — framed by other sites, so it carries no
+   page chrome and sizes itself to the iframe height. */
+.embed-strip {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 0 14px;
+  height: 46px;
+  overflow-x: auto;
+  white-space: nowrap;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  scrollbar-width: none;
+}
+
+.embed-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.embed-brand {
+  margin-left: auto;
+  padding-left: 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+  text-decoration: none;
+}
+
+.embed-brand:hover {
+  color: var(--ink);
+}
+
+/* Copyable embed snippet. */
+.code-block {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--paper-2);
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* pair-link is also used as a <button> in the widget picker. */
+button.pair-link {
+  font-family: inherit;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.pair-link.picked {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* Movers heatmap tints the same pill used elsewhere. */
+.pair-link.heat-up {
+  border-color: var(--up);
+  color: var(--up);
+}
+
+.pair-link.heat-down {
+  border-color: var(--down);
+  color: var(--down);
+}
+
+/* The invested calculator reuses .fx-field with a <select>. */
+.fx-field select {
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  outline: none;
+  cursor: pointer;
+}
+
+.range-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+a.range-btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
