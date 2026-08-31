@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { COMPARE_SLUGS } from "@/lib/compare";
 import { dcaSitemapSymbols } from "@/lib/dca";
+import { CPI_COUNTRIES, cpiYearRange } from "@/lib/cpi";
 import { THEME_LISTS } from "@/lib/lists";
 import { MOVERS_PERIODS } from "@/lib/movers-period";
 import { RANKING_MARKETS, RANKING_METRICS } from "@/lib/ranking";
@@ -63,6 +64,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
         }))
       ),
       { url: `${SITE_URL}${p}/compare`, changeFrequency: "weekly" as const, priority: 0.8 },
+      { url: `${SITE_URL}${p}/inflation`, changeFrequency: "monthly" as const, priority: 0.6 },
+      ...CPI_COUNTRIES.flatMap((country) => {
+        const { min, max } = cpiYearRange(country);
+        return Array.from({ length: max - min }, (_, i) => min + i).map((year) => ({
+          url: `${SITE_URL}${p}/inflation/${country}/${year}`,
+          changeFrequency: "monthly" as const,
+          priority: 0.5,
+        }));
+      }),
       { url: `${SITE_URL}${p}/list`, changeFrequency: "weekly" as const, priority: 0.8 },
       ...THEME_LISTS.map((l) => ({
         url: `${SITE_URL}${p}/list/${l.slug}`,
