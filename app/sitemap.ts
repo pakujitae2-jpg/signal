@@ -21,6 +21,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...["", "/ko", "/ja"].flatMap((p) => [
       { url: `${SITE_URL}${p}/kimchi-premium`, changeFrequency: "hourly" as const, priority: 0.9 },
       { url: `${SITE_URL}${p}/fear-greed`, changeFrequency: "daily" as const, priority: 0.9 },
+      { url: `${SITE_URL}${p}/bitcoin-dominance`, changeFrequency: "hourly" as const, priority: 0.8 },
+      { url: `${SITE_URL}${p}/altcoin-season`, changeFrequency: "hourly" as const, priority: 0.8 },
       { url: `${SITE_URL}${p}/movers`, changeFrequency: "hourly" as const, priority: 0.9 },
       { url: `${SITE_URL}${p}/compare`, changeFrequency: "weekly" as const, priority: 0.8 },
       { url: `${SITE_URL}${p}/tools/invested`, changeFrequency: "weekly" as const, priority: 0.8 },

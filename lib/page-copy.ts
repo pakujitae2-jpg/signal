@@ -125,6 +125,43 @@ export type AthCopy = {
   footer: string;
 };
 
+export type DominanceCopy = {
+  title: string;
+  description: string;
+  h1: string;
+  sub: string;
+  btcDominanceLabel: string;
+  totalMarketCapLabel: string;
+  aboutHeading: string;
+  aboutP: string;
+  relatedPrefix: string;
+  altseasonLinkText: string;
+  relatedSuffix: string;
+  unavailable: string;
+  footer: string;
+};
+
+export type AltseasonCopy = {
+  title: string;
+  description: string;
+  h1: string;
+  sub: string;
+  indexLabel: string;
+  bitcoinSeason: string;
+  neutral: string;
+  altcoinSeason: string;
+  /** {N} */ universeNote: string;
+  btcReturnLabel: string;
+  /** {M} {N} */ outperformingLabel: string;
+  aboutHeading: string;
+  aboutP: string;
+  relatedPrefix: string;
+  dominanceLinkText: string;
+  relatedSuffix: string;
+  unavailable: string;
+  footer: string;
+};
+
 export type PageCopy = {
   kimchi: Record<Lang, KimchiCopy>;
   feargreed: Record<Lang, FearGreedCopy>;
@@ -133,11 +170,15 @@ export type PageCopy = {
   "markets-korea": Record<Lang, MarketsEquityCopy>;
   "markets-crypto": Record<Lang, MarketsCryptoCopy>;
   ath: Record<Lang, AthCopy>;
+  dominance: Record<Lang, DominanceCopy>;
+  altseason: Record<Lang, AltseasonCopy>;
 };
 
 export const kimchiCopy = (lang: Lang): KimchiCopy => PAGE_COPY.kimchi[lang];
 export const fearGreedCopy = (lang: Lang): FearGreedCopy => PAGE_COPY.feargreed[lang];
 export const athCopy = (lang: Lang): AthCopy => PAGE_COPY.ath[lang];
+export const dominanceCopy = (lang: Lang): DominanceCopy => PAGE_COPY.dominance[lang];
+export const altseasonCopy = (lang: Lang): AltseasonCopy => PAGE_COPY.altseason[lang];
 
 export type RegionKey = "us" | "japan" | "korea" | "crypto";
 export const REGION_KEYS: RegionKey[] = ["us", "japan", "korea", "crypto"];
