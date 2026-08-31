@@ -8,6 +8,7 @@ import { AFFILIATES, AFFILIATE_DISCLOSURE } from "@/config/affiliates";
 import { CryptoPairPage, cryptoPairMetadata, isCryptoPairSlug } from "./CryptoPairPage";
 import { fmtTime } from "@/lib/format";
 import { CURRENCIES, CURRENCY_CODES, MAJOR, amountSlug, amountsFor, fxSymbol, getFxRate, pairSlug, parseSlug, type FxRate } from "@/lib/fx";
+import { fxTable } from "@/lib/fx-history";
 import { COPY, LANGS, LANG_LABEL, curCountry, curName, languageAlternates, numFmt, prefix, type Lang } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
 
@@ -124,12 +125,14 @@ function Crumbs({ lang, items }: { lang: Lang; items: { name: string; path: stri
   );
 }
 
-function CurrencyHub({ lang, code }: { lang: Lang; code: string }) {
+async function CurrencyHub({ lang, code }: { lang: Lang; code: string }) {
   const c = COPY[lang];
+  const f = numFmt(lang);
   const p = prefix(lang);
   const others = CURRENCY_CODES.filter((x) => x !== code);
   const majors = MAJOR.filter((x) => x !== code);
   const path = `/convert/${code.toLowerCase()}`;
+  const table = await fxTable(code);
   return (
     <div className="paper">
       <Header lang={lang} path={path} />
@@ -140,6 +143,50 @@ function CurrencyHub({ lang, code }: { lang: Lang; code: string }) {
           <p className="quote-sub">{CURRENCIES[code].symbol} · {c.usedIn(curCountry(lang, code))}</p>
         </div>
       </div>
+
+      <section className="block">
+        <div className="kicker"><h2 className="kicker-label">{c.rateTableHeading}</h2></div>
+        {table ? (
+          <div className="table-scroll">
+            <table className="mkt">
+              <thead>
+                <tr>
+                  <th style={{ textAlign: "left" }}>{c.colCurrency}</th>
+                  <th>{c.colRates}</th>
+                  <th>{c.colDayChange}</th>
+                  <th>{c.colInverse}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {table
+                  .filter((r) => r.code !== code)
+                  .sort((a, b) => {
+                    const ai = MAJOR.indexOf(a.code);
+                    const bi = MAJOR.indexOf(b.code);
+                    if (ai !== -1 || bi !== -1) return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+                    return a.code.localeCompare(b.code);
+                  })
+                  .map((r) => {
+                    const dayPct = r.prevRate ? ((r.rate - r.prevRate) / r.prevRate) * 100 : null;
+                    const dir = dayPct === null ? "flat" : dayPct > 0.005 ? "up" : dayPct < -0.005 ? "down" : "flat";
+                    return (
+                      <tr key={r.code}>
+                        <td style={{ textAlign: "left" }}>
+                          <Link className="qlink" href={`${p}/convert/${pairSlug(code, r.code)}`}>{curName(lang, r.code)} ({r.code})</Link>
+                        </td>
+                        <td>{f.rate(r.rate)}</td>
+                        <td>{dayPct === null ? "—" : <span className={`chg ${dir}`}>{dayPct >= 0 ? "+" : "−"}{Math.abs(dayPct).toFixed(2)}%</span>}</td>
+                        <td>{f.rate(1 / r.rate)}</td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="wire-note">{c.rateTableUnavailable}</p>
+        )}
+      </section>
 
       <section className="block">
         <div className="kicker"><h2 className="kicker-label">{c.hubToOthers(code)}</h2></div>

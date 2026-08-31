@@ -162,6 +162,10 @@ export type Copy = {
   aboutRates: string;
   aboutRatesBody: (n: number, first: string, last: string) => string;
   usedIn: (country: string) => string;
+  rateTableHeading: string;
+  colDayChange: string;
+  colInverse: string;
+  rateTableUnavailable: string;
 };
 
 const dir3 = (d: "up" | "down" | "flat", up: string, down: string, flat: string) => (d === "up" ? up : d === "down" ? down : flat);
@@ -220,6 +224,10 @@ const EN: Copy = {
   aboutRates: "About These Rates",
   aboutRatesBody: (n, first, last) => `Every rate on PNL404 is the live mid-market rate — the midpoint between the global buy and sell prices — and pages refresh continuously during FX trading hours. Each pair page includes a two-way converter, a 30-day trend and a conversion table for ${n} common amounts, and every amount from ${first} to ${last} has its own page. Banks and transfer services add a margin on top of the mid-market rate, so treat these figures as the benchmark to compare offers against.`,
   usedIn: (c) => `used in ${c}`,
+  rateTableHeading: "Live Exchange Rates",
+  colDayChange: "Day Change",
+  colInverse: "Inverse",
+  rateTableUnavailable: "Live rates are temporarily unavailable.",
 };
 
 const KO_COPY: Copy = {
@@ -276,6 +284,10 @@ const KO_COPY: Copy = {
   aboutRates: "환율 안내",
   aboutRatesBody: (n, first, last) => `PNL404의 모든 환율은 전 세계 매수·매도 호가의 중간값인 시장 중간가이며, 외환 거래 시간 동안 계속 갱신됩니다. 각 통화쌍 페이지에는 양방향 계산기, 30일 추이, ${n}개 금액의 환산표가 있고 ${first}부터 ${last}까지 금액별 페이지가 따로 있습니다. 은행과 송금 서비스는 여기에 수수료를 더하므로, 이 수치는 환전 조건을 비교하는 기준으로 활용하세요.`,
   usedIn: (c) => `${c}`,
+  rateTableHeading: "실시간 환율표",
+  colDayChange: "전일 대비",
+  colInverse: "역환율",
+  rateTableUnavailable: "실시간 환율을 지금 불러올 수 없습니다.",
 };
 
 const JA_COPY: Copy = {
@@ -332,6 +344,10 @@ const JA_COPY: Copy = {
   aboutRates: "レートについて",
   aboutRatesBody: (n, first, last) => `PNL404のすべてのレートは世界の買値と売値の中間値である仲値で、外国為替市場の取引時間中は継続的に更新されます。各通貨ペアのページには双方向の計算機、30日間の推移、${n}種類の金額の換算表があり、${first}から${last}までの金額ごとに個別ページがあります。銀行や送金サービスは仲値に手数料を上乗せするため、この数値は両替条件を比較する基準としてご利用ください。`,
   usedIn: (c) => `${c}`,
+  rateTableHeading: "リアルタイム為替レート表",
+  colDayChange: "前日比",
+  colInverse: "逆レート",
+  rateTableUnavailable: "リアルタイムレートを現在取得できません。",
 };
 
 export const COPY: Record<Lang, Copy> = { en: EN, ko: KO_COPY, ja: JA_COPY };

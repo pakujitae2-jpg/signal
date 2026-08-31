@@ -105,3 +105,43 @@ export function historyYears(now: Date = new Date()): number[] {
 export function isValidHistoryYear(year: number, now: Date = new Date()): boolean {
   return Number.isInteger(year) && year >= MIN_YEAR && year <= now.getUTCFullYear();
 }
+
+export type FxTableRow = { code: string; rate: number; prevRate: number | null; date: string };
+
+/**
+ * Every tracked currency's rate against `base`, plus a day-change reference
+ * where one is available — one call (omitting `quotes=` returns Frankfurter's
+ * full ~165-currency set, verified live), filtered down to the 43 this site
+ * tracks rather than letting their catalogue silently expand ours. A single
+ * request across a short trailing window also carries the previous day's
+ * rate, so this never needs a second round trip for the change column.
+ */
+export async function fxTable(base: string, asOfDate?: string): Promise<FxTableRow[] | null> {
+  if (!CURRENCIES[base]) return null;
+  try {
+    const to = asOfDate ?? new Date().toISOString().slice(0, 10);
+    const from = new Date(Date.parse(to) - 5 * 86400_000).toISOString().slice(0, 10);
+    const url = `${V2_RATES}?from=${from}&to=${to}&base=${base}`;
+    const json = await fetchJson(url, CACHE_TTL_SEC);
+    if (!Array.isArray(json)) return null;
+
+    const byCode = new Map<string, { date: string; rate: number }[]>();
+    for (const row of json) {
+      if (typeof row?.quote !== "string" || typeof row?.rate !== "number" || typeof row?.date !== "string") continue;
+      if (!CURRENCIES[row.quote]) continue;
+      if (!byCode.has(row.quote)) byCode.set(row.quote, []);
+      byCode.get(row.quote)!.push({ date: row.date, rate: row.rate });
+    }
+
+    const out: FxTableRow[] = [];
+    for (const [code, entries] of byCode) {
+      entries.sort((a, b) => a.date.localeCompare(b.date));
+      const latest = entries[entries.length - 1];
+      const prev = [...entries].reverse().find((e) => e.date !== latest.date && e.rate !== latest.rate);
+      out.push({ code, rate: latest.rate, prevRate: prev?.rate ?? null, date: latest.date });
+    }
+    return out.length > 0 ? out.sort((a, b) => a.code.localeCompare(b.code)) : null;
+  } catch {
+    return null;
+  }
+}
