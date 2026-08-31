@@ -6,6 +6,7 @@ import { CURRENCY_CODES, FX_SLUGS } from "@/lib/fx";
 import { DON_PRESETS, donSlug } from "@/lib/gold";
 import { POPULAR_SYMBOLS } from "@/lib/popular";
 import { SITE_URL } from "@/lib/site";
+import { byGroup } from "@/lib/universe";
 
 const MARKET_HOLIDAY_YEARS = [2026, 2027];
 
@@ -43,6 +44,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
           priority: 0.6,
         }))
       ),
+      { url: `${SITE_URL}${p}/ath`, changeFrequency: "hourly" as const, priority: 0.8 },
+      ...byGroup("crypto").map((e) => ({
+        url: `${SITE_URL}${p}/ath/${e.symbol.replace(/-USD$/, "").toLowerCase()}`,
+        changeFrequency: "hourly" as const,
+        priority: 0.6,
+      })),
       { url: `${SITE_URL}${p}/widget`, changeFrequency: "monthly" as const, priority: 0.6 },
       { url: `${SITE_URL}${p}/pulse`, changeFrequency: "weekly" as const, priority: 0.8 },
       ...PULSE_SLUGS.map((slug) => ({

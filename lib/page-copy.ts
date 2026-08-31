@@ -99,6 +99,32 @@ export type MarketsCryptoCopy = MarketsCommon & {
   colMktCap: string;
 };
 
+export type AthCopy = {
+  title: string;
+  description: string;
+  h1: string;
+  sub: string;
+  colRank: string;
+  colName: string;
+  colPrice: string;
+  colAth: string;
+  colFromAth: string;
+  colAthDate: string;
+  colDaysSince: string;
+  colRecovery: string;
+  asOf: string;
+  /** {NAME} */ detailTitle: string;
+  /** {NAME} {DATE} */ detailDescription: string;
+  /** {N} */ daysSinceAth: string;
+  /** {X} */ recoveryNote: string;
+  /** {DATE} */ athOnLabel: string;
+  aboutHeading: string;
+  aboutP: string;
+  attribution: string;
+  unavailable: string;
+  footer: string;
+};
+
 export type PageCopy = {
   kimchi: Record<Lang, KimchiCopy>;
   feargreed: Record<Lang, FearGreedCopy>;
@@ -106,10 +132,12 @@ export type PageCopy = {
   "markets-japan": Record<Lang, MarketsEquityCopy>;
   "markets-korea": Record<Lang, MarketsEquityCopy>;
   "markets-crypto": Record<Lang, MarketsCryptoCopy>;
+  ath: Record<Lang, AthCopy>;
 };
 
 export const kimchiCopy = (lang: Lang): KimchiCopy => PAGE_COPY.kimchi[lang];
 export const fearGreedCopy = (lang: Lang): FearGreedCopy => PAGE_COPY.feargreed[lang];
+export const athCopy = (lang: Lang): AthCopy => PAGE_COPY.ath[lang];
 
 export type RegionKey = "us" | "japan" | "korea" | "crypto";
 export const REGION_KEYS: RegionKey[] = ["us", "japan", "korea", "crypto"];
