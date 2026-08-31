@@ -368,7 +368,11 @@ export const FEATURE_COPY: FeatureCopy = {
       "aboutHeading": "About This Page",
       "aboutP": "Ranked on the move against the previous close, across the most liquid names on this desk. Markets in different time zones are open at different hours, so a quiet session in one region can leave its names clustered near zero while another region does the moving.",
       "unavailable": "Live data is not available right now, so today's ranking cannot be shown.",
-      "footer": "Market data may be delayed and is provided for information only, not investment advice."
+      "footer": "Market data may be delayed and is provided for information only, not investment advice.",
+      "periodNavHeading": "Time Period",
+      "periodLabels": { "week": "1 Week", "month": "1 Month", "ytd": "YTD", "1y": "1 Year", "3y": "3 Years", "5y": "5 Years" },
+      "periodH1": "{PERIOD} Movers",
+      "periodDescription": "The biggest {PERIOD} movers across US, Japanese and Korean stocks and the top cryptocurrencies this site tracks."
     },
     "ko": {
       "title": "오늘의 급등락 종목 — 상승률·하락률 상위",
@@ -386,7 +390,11 @@ export const FEATURE_COPY: FeatureCopy = {
       "aboutHeading": "페이지 안내",
       "aboutP": "이 페이지에서는 거래가 가장 활발한 종목을 대상으로 전일 대비 등락률 순으로 순위를 매깁니다. 지역마다 시차가 있어 증시 개장 시간이 다르기 때문에, 한 지역 증시가 한산한 날에는 해당 종목들의 등락률이 0% 부근에 몰리고 그사이 다른 지역 종목들이 상승률·하락률 상위를 채우기도 합니다.",
       "unavailable": "현재 실시간 시세를 불러올 수 없어 오늘의 급등락 순위를 표시할 수 없습니다.",
-      "footer": "시세 정보는 지연될 수 있으며, 투자 자문이 아닌 정보 제공을 목적으로 합니다."
+      "footer": "시세 정보는 지연될 수 있으며, 투자 자문이 아닌 정보 제공을 목적으로 합니다.",
+      "periodNavHeading": "기간 선택",
+      "periodLabels": { "week": "1주일", "month": "1개월", "ytd": "연초 이후", "1y": "1년", "3y": "3년", "5y": "5년" },
+      "periodH1": "{PERIOD} 수익률 상위",
+      "periodDescription": "이 사이트가 추적하는 미국·일본·한국 증시 종목과 주요 가상자산 중 {PERIOD} 수익률이 가장 높거나 낮은 종목입니다."
     },
     "ja": {
       "title": "本日の値上がり・値下がりランキング｜米国・日本・韓国株と暗号資産",
@@ -404,7 +412,11 @@ export const FEATURE_COPY: FeatureCopy = {
       "aboutHeading": "このページについて",
       "aboutP": "当サイトが取り扱う流動性の高い銘柄を対象に、前日終値からの騰落率で順位付けしています。地域によって取引時間帯が異なるため、ある市場が閑散としている日は、その地域の銘柄の騰落率がゼロ付近に集中し、上位・下位が別の地域の銘柄で占められることもあります。",
       "unavailable": "現在、リアルタイムデータを取得できないため、本日のランキングを表示できません。",
-      "footer": "市場データには遅延が生じる場合があります。情報提供のみを目的としており、投資助言ではありません。"
+      "footer": "市場データには遅延が生じる場合があります。情報提供のみを目的としており、投資助言ではありません。",
+      "periodNavHeading": "期間を選択",
+      "periodLabels": { "week": "1週間", "month": "1カ月", "ytd": "年初来", "1y": "1年", "3y": "3年", "5y": "5年" },
+      "periodH1": "{PERIOD}騰落率ランキング",
+      "periodDescription": "本サイトが追跡する米国株・日本株・韓国株と主要な暗号資産の中から、{PERIOD}の騰落率が大きい銘柄をランキングします。"
     }
   },
   "search": {

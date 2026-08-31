@@ -143,6 +143,10 @@ export type MoversCopy = {
   aboutP: string;
   unavailable: string;
   footer: string;
+  periodNavHeading: string;
+  periodLabels: { week: string; month: string; ytd: string; "1y": string; "3y": string; "5y": string };
+  /** {PERIOD} */ periodH1: string;
+  /** {PERIOD} */ periodDescription: string;
 };
 
 export type SearchCopy = {

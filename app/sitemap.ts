@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 import { COMPARE_SLUGS } from "@/lib/compare";
 import { dcaSitemapSymbols } from "@/lib/dca";
 import { THEME_LISTS } from "@/lib/lists";
+import { MOVERS_PERIODS } from "@/lib/movers-period";
+import { RANKING_MARKETS, RANKING_METRICS } from "@/lib/ranking";
 import { HOLIDAY_MARKET_KEYS, MARKET_KEYS } from "@/config/exchange-schedule";
 import { PULSE_SLUGS } from "@/lib/pulse";
 import { CRYPTO_CODES, CURRENCY_CODES, FX_SLUGS, MAJOR, pairSlug } from "@/lib/fx";
@@ -47,6 +49,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.4,
       })),
       { url: `${SITE_URL}${p}/movers`, changeFrequency: "hourly" as const, priority: 0.9 },
+      ...MOVERS_PERIODS.map((period) => ({
+        url: `${SITE_URL}${p}/movers/${period}`,
+        changeFrequency: "hourly" as const,
+        priority: 0.7,
+      })),
+      { url: `${SITE_URL}${p}/ranking`, changeFrequency: "weekly" as const, priority: 0.7 },
+      ...RANKING_METRICS.flatMap((metric) =>
+        RANKING_MARKETS.map((market) => ({
+          url: `${SITE_URL}${p}/ranking/${metric}/${market}`,
+          changeFrequency: "hourly" as const,
+          priority: 0.6,
+        }))
+      ),
       { url: `${SITE_URL}${p}/compare`, changeFrequency: "weekly" as const, priority: 0.8 },
       { url: `${SITE_URL}${p}/list`, changeFrequency: "weekly" as const, priority: 0.8 },
       ...THEME_LISTS.map((l) => ({

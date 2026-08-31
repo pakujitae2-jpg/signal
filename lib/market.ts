@@ -20,12 +20,15 @@ function downsample(values: number[], target = 40): number[] {
 const isNum = (v: unknown): v is number => typeof v === "number" && isFinite(v);
 const num = (v: unknown): number | null => (isNum(v) ? v : null);
 
-type SparkRow = { closes: number[]; prev: number | null; last: number | null };
+type SparkRow = { closes: number[]; prev: number | null; last: number | null; timestamps: number[] };
 
 /**
  * Yahoo's spark endpoint answers in one of two shapes depending on the edge
  * that serves it: `{ spark: { result: [{ symbol, response: [chart] }] } }`
  * or a flat map `{ [symbol]: { close, timestamp, chartPreviousClose } }`.
+ * `timestamps` is left empty (never null-padded against `closes`) if a shape
+ * doesn't carry it, so callers must treat a length mismatch as "unavailable"
+ * rather than zip the two arrays positionally.
  */
 export function parseSpark(json: any): Map<string, SparkRow> {
   const out = new Map<string, SparkRow>();
@@ -36,22 +39,28 @@ export function parseSpark(json: any): Map<string, SparkRow> {
       if (!r?.symbol || !resp) continue;
       const meta = resp.meta ?? {};
       const closes: number[] = (resp.indicators?.quote?.[0]?.close ?? []).filter(isNum);
+      const rawTs: unknown[] = resp.timestamp ?? [];
+      const timestamps = rawTs.length === closes.length ? rawTs.filter(isNum).map((t) => t * 1000) : [];
       out.set(r.symbol, {
         closes,
         prev: num(meta.chartPreviousClose) ?? num(meta.previousClose),
         last: num(meta.regularMarketPrice) ?? (closes.length ? closes[closes.length - 1] : null),
+        timestamps,
       });
     }
     return out;
   }
   for (const [symbol, e] of Object.entries(json ?? {})) {
     if (!e || typeof e !== "object") continue;
-    const entry = e as { close?: unknown[]; chartPreviousClose?: unknown; previousClose?: unknown };
+    const entry = e as { close?: unknown[]; timestamp?: unknown[]; chartPreviousClose?: unknown; previousClose?: unknown };
     const closes: number[] = (entry.close ?? []).filter(isNum);
+    const rawTs: unknown[] = entry.timestamp ?? [];
+    const timestamps = rawTs.length === closes.length ? rawTs.filter(isNum).map((t) => t * 1000) : [];
     out.set(symbol, {
       closes,
       prev: num(entry.chartPreviousClose) ?? num(entry.previousClose),
       last: closes.length ? closes[closes.length - 1] : null,
+      timestamps,
     });
   }
   return out;
@@ -88,7 +97,7 @@ async function fetchQuotes(): Promise<Quote[]> {
   if (missing.length > 0) {
     const wide = await fetchSpark(missing, "5d", "15m", 120);
     for (const [symbol, row] of wide) {
-      if (row.last !== null) rows.set(symbol, { closes: row.closes, prev: null, last: row.last });
+      if (row.last !== null) rows.set(symbol, { closes: row.closes, prev: null, last: row.last, timestamps: row.timestamps });
     }
   }
 
