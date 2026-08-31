@@ -161,5 +161,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.6,
       })),
     ]),
+    // Seasonality: same curated symbol set as /quote itself; symbols with
+    // under 10 years of history render an honest "unavailable" state rather
+    // than being pre-filtered out of the sitemap (that would need fetching
+    // all 550 symbols' full history just to build the sitemap).
+    ...["", "/ko", "/ja"].flatMap((p) =>
+      POPULAR_SYMBOLS.map((symbol) => ({
+        url: `${SITE_URL}${p}/quote/${encodeURIComponent(symbol)}/seasonality`,
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
+      }))
+    ),
   ];
 }

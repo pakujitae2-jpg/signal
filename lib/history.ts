@@ -24,7 +24,13 @@ export async function getHistory(symbol: string): Promise<History> {
   if (hit && Date.now() - hit.ts < CACHE_TTL_MS) return hit.data;
 
   try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=max&interval=1mo`;
+    // range=max silently downsamples to quarterly once a symbol has enough
+    // history (verified: ^GSPC returns 168 Mar/Jun/Sep/Dec points that way,
+    // vs. 501 true monthly points below) — explicit period1/period2 avoids
+    // that entirely; period1=0 (the Unix epoch) is clamped to the symbol's
+    // actual first trade date by Yahoo.
+    const period2 = Math.floor(Date.now() / 1000);
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?period1=0&period2=${period2}&interval=1mo`;
     const json = await fetchJson(url, 21600);
     const r = json?.chart?.result?.[0];
     const ts: number[] = r?.timestamp ?? [];
