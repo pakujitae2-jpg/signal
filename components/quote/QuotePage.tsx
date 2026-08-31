@@ -7,12 +7,18 @@ import { dividendsFor } from "@/lib/dividends";
 import { fmtNum } from "@/lib/format";
 import { LANGS, LANG_LABEL, languageAlternates, prefix, type Lang } from "@/lib/i18n";
 import { localName } from "@/lib/names";
+import { LOCAL_NAMES } from "@/lib/names.generated";
 import { getQuoteDetail, isValidSymbol, type QuoteDetail } from "@/lib/quote";
 import { QUOTE_COPY, type Dir } from "@/lib/quote-copy";
 import { SITE_URL } from "@/lib/site";
 import { byGroup, universeEntry, type UniverseGroup } from "@/lib/universe";
 
 // One template renders /quote/[symbol] in every locale.
+
+// JPX unified all domestic equity trading units to 100 shares on 2018-10-01
+// (https://www.jpx.co.jp/equities/improvements/trading-unit/); a sourced
+// constant, not a fetched field — data_j.xls carries no 単元株数 column.
+const JP_UNIT_SHARE = 100;
 
 export function displaySymbol(symbol: string): string {
   return symbol.replace(/^\^/, "").replace(/\.(KS|KQ|T|SS)$/, "").replace(/-USD$/i, "").replace(/=[XF]$/, "");
@@ -65,7 +71,7 @@ function nameOf(lang: Lang, symbol: string, detail: QuoteDetail | null): string 
 
 export async function quoteMetadata(lang: Lang, raw: string): Promise<Metadata> {
   const symbol = decodeURIComponent(raw);
-  if (!isValidSymbol(symbol)) return { title: "PNL404" };
+  if (!isValidSymbol(symbol) || !universeEntry(symbol)) return { title: "PNL404" };
   const c = QUOTE_COPY[lang];
   const detail = await getQuoteDetail(symbol, "1d");
   const group = groupOf(symbol);
@@ -85,6 +91,9 @@ export async function quoteMetadata(lang: Lang, raw: string): Promise<Metadata> 
     alternates: { canonical: `${prefix(lang)}${path}`, languages: languageAlternates(path) },
     openGraph: { type: "website", siteName: "PNL404", title, description, url: `${prefix(lang)}${path}` },
     twitter: { card: "summary_large_image", title, description },
+    // Known symbol, but the upstream fetch failed — an unbounded soft-404
+    // family otherwise dilutes crawl budget across the whole sitemap.
+    ...(detail === null ? { robots: { index: false, follow: true } } : {}),
   };
 }
 
@@ -107,6 +116,19 @@ function About({ lang, detail, group, name, sym }: { lang: Lang; detail: QuoteDe
       </div>
       <p>{lead}</p>
       <p>{c.aboutWhat[group](name)}</p>
+      {group === "jp-stock" && live && (
+        <div className="board" style={{ marginTop: 12 }}>
+          <div className="board-cell">
+            <span className="b-name">{c.unitShareLabel}</span>
+            <span className="b-value stat-value">{JP_UNIT_SHARE}</span>
+          </div>
+          <div className="board-cell">
+            <span className="b-name">{c.minPurchaseLabel}</span>
+            <span className="b-value stat-value">{fmtNum(detail.price! * JP_UNIT_SHARE, cur)}</span>
+          </div>
+        </div>
+      )}
+      {group === "jp-stock" && live && <p className="fineprint">{c.unitShareNote.replace("{N}", String(JP_UNIT_SHARE))}</p>}
     </section>
   );
 }
@@ -137,7 +159,7 @@ function Related({ lang, symbol, group }: { lang: Lang; symbol: string; group: U
 
 export async function QuotePage({ lang, symbol: raw }: { lang: Lang; symbol: string }) {
   const symbol = decodeURIComponent(raw);
-  if (!isValidSymbol(symbol)) notFound();
+  if (!isValidSymbol(symbol) || !universeEntry(symbol)) notFound();
   const c = QUOTE_COPY[lang];
   const p = prefix(lang);
   const initial = await getQuoteDetail(symbol, "1d");
@@ -178,7 +200,19 @@ export async function QuotePage({ lang, symbol: raw }: { lang: Lang; symbol: str
         }}
       />
       {(group === "us-stock" || group === "jp-stock" || group === "kr-stock") && (
-        <JsonLd data={{ "@context": "https://schema.org", "@type": "Corporation", name, tickerSymbol: sym, url: pageUrl }} />
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "Corporation",
+            name,
+            tickerSymbol: sym,
+            url: pageUrl,
+            ...(() => {
+              const alt = [entry?.name, ...(LOCAL_NAMES[symbol] ?? [])].filter((n): n is string => Boolean(n) && n !== name);
+              return alt.length > 0 ? { alternateName: [...new Set(alt)] } : {};
+            })(),
+          }}
+        />
       )}
 
       {initial ? (

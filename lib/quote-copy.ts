@@ -44,6 +44,9 @@ export type QuoteCopy = {
   seasonalityLink: (name: string) => string;
   dcaLink: (name: string) => string;
   averageLink: (name: string) => string;
+  unitShareLabel: string;
+  minPurchaseLabel: string;
+  /** {N} */ unitShareNote: string;
   unavailable: (sym: string) => string;
   backHome: string;
   footer: string;
@@ -106,6 +109,9 @@ const EN: QuoteCopy = {
   seasonalityLink: (name) => `${name} seasonality →`,
   dcaLink: (name) => `${name} DCA calculator →`,
   averageLink: (name) => `${name} average cost calculator →`,
+  unitShareLabel: "Unit share size",
+  minPurchaseLabel: "Minimum purchase",
+  unitShareNote: "{N} shares — Japan's exchanges unified all domestic equities to this trading unit on 2018-10-01.",
   unavailable: (sym) => `No data is available for “${sym}” right now. The symbol may be unknown, or the data provider may be unreachable.`,
   backHome: "← Back to the front page",
   footer: "Market data may be delayed and is provided for information only, not investment advice.",
@@ -170,6 +176,9 @@ const KO: QuoteCopy = {
   seasonalityLink: (name) => `${name} 계절성 →`,
   dcaLink: (name) => `${name} 적립식 투자 계산기 →`,
   averageLink: (name) => `${name} 평단가(물타기) 계산기 →`,
+  unitShareLabel: "단원주(매매 단위)",
+  minPurchaseLabel: "최소 매수 금액",
+  unitShareNote: "{N}주 — 일본 증권거래소는 2018년 10월 1일 국내 주식의 매매 단위를 이 기준으로 통일했습니다.",
   unavailable: (sym) => `“${sym}”의 데이터를 지금 불러올 수 없습니다. 존재하지 않는 종목이거나 데이터 제공처에 일시적으로 접속할 수 없습니다.`,
   backHome: "← 첫 화면으로",
   footer: "시세는 지연될 수 있으며 정보 제공 목적으로만 제공됩니다. 투자 권유가 아닙니다.",
@@ -234,6 +243,9 @@ const JA: QuoteCopy = {
   seasonalityLink: (name) => `${name}の季節性 →`,
   dcaLink: (name) => `${name}の積立シミュレーション →`,
   averageLink: (name) => `${name}の平均取得単価計算機 →`,
+  unitShareLabel: "単元株数",
+  minPurchaseLabel: "最低購入代金",
+  unitShareNote: "{N}株 — 東京証券取引所をはじめ日本の証券取引所は2018年10月1日、国内株式の売買単位をこの株数に統一しました。",
   unavailable: (sym) => `「${sym}」のデータを現在取得できません。銘柄コードが存在しないか、データ提供元に一時的に接続できない可能性があります。`,
   backHome: "← トップページへ",
   footer: "相場情報は遅延する場合があり、情報提供のみを目的としています。投資勧誘ではありません。",
