@@ -5,6 +5,7 @@ import AdSlot from "@/components/AdSlot";
 import FxConverter from "@/components/FxConverter";
 import JsonLd from "@/components/JsonLd";
 import { AFFILIATES, AFFILIATE_DISCLOSURE } from "@/config/affiliates";
+import { CryptoPairPage, cryptoPairMetadata, isCryptoPairSlug } from "./CryptoPairPage";
 import { fmtTime } from "@/lib/format";
 import { CURRENCIES, CURRENCY_CODES, MAJOR, amountSlug, amountsFor, fxSymbol, getFxRate, pairSlug, parseSlug, type FxRate } from "@/lib/fx";
 import { COPY, LANGS, LANG_LABEL, curCountry, curName, languageAlternates, numFmt, prefix, type Lang } from "@/lib/i18n";
@@ -33,6 +34,7 @@ export async function pairMetadata(lang: Lang, slug: string): Promise<Metadata> 
     const code = slug.toUpperCase();
     return meta(lang, `/convert/${slug}`, c.hubTitle(code), c.hubDesc(code, CURRENCY_CODES.length - 1));
   }
+  if (isCryptoPairSlug(slug)) return cryptoPairMetadata(lang, slug);
   const parsed = parseSlug(slug);
   if (!parsed) return { title: "PNL404" };
   const { base, quote, amount } = parsed;
@@ -182,6 +184,7 @@ function CurrencyHub({ lang, code }: { lang: Lang; code: string }) {
 
 export async function PairPage({ lang, slug }: { lang: Lang; slug: string }) {
   if (isHub(slug)) return <CurrencyHub lang={lang} code={slug.toUpperCase()} />;
+  if (isCryptoPairSlug(slug)) return CryptoPairPage({ lang, slug });
   const parsed = parseSlug(slug);
   if (!parsed) notFound();
   const { base, quote, amount } = parsed;

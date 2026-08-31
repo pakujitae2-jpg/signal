@@ -1,5 +1,6 @@
 import { fetchJson } from "./http";
 import { getQuoteDetail, type Range } from "./quote";
+import { byGroup } from "./universe";
 
 // Currency-conversion pages: /convert/usd-to-krw and /convert/100-usd-to-krw.
 // Rates come from Yahoo (intraday, with history); if a pair is missing there
@@ -108,14 +109,29 @@ export const FX_SLUGS: string[] = [
   ),
 ];
 
+// Cryptocurrency codes valid as a /convert leg alongside the fiat CURRENCIES
+// above (e.g. /convert/btc-to-krw). Derived from the site's own crypto
+// universe rather than a hand-maintained list, so it stays in sync with it.
+export const CRYPTO_CODES: string[] = byGroup("crypto").map((e) => e.symbol.replace(/-USD$/, ""));
+const CRYPTO_SET: ReadonlySet<string> = new Set(CRYPTO_CODES);
+export function isCryptoCode(code: string): boolean {
+  return CRYPTO_SET.has(code.toUpperCase());
+}
+
 export type ParsedSlug = { base: string; quote: string; amount: number | null };
 
 export function parseSlug(slug: string): ParsedSlug | null {
-  const m = /^(?:(\d{1,9}(?:\.\d{1,2})?)-)?([a-z]{3})-to-([a-z]{3})$/.exec(slug);
+  const m = /^(?:(\d{1,9}(?:\.\d{1,8})?)-)?([a-z0-9]{2,6})-to-([a-z0-9]{2,6})$/.exec(slug);
   if (!m) return null;
   const base = m[2].toUpperCase();
   const quote = m[3].toUpperCase();
-  if (!CURRENCIES[base] || !CURRENCIES[quote] || base === quote) return null;
+  const baseValid = Boolean(CURRENCIES[base]) || isCryptoCode(base);
+  const quoteValid = Boolean(CURRENCIES[quote]) || isCryptoCode(quote);
+  if (!baseValid || !quoteValid || base === quote) return null;
+  // Crypto-to-crypto pairs aren't wired up yet (lib/crypto-fx.ts only
+  // resolves one crypto leg against one fiat leg) — both legs valid but both
+  // crypto means neither is a fiat anchor, so reject rather than mis-render.
+  if (isCryptoCode(base) && isCryptoCode(quote)) return null;
   let amount: number | null = null;
   if (m[1] !== undefined) {
     amount = Number(m[1]);

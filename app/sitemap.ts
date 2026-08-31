@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { COMPARE_SLUGS } from "@/lib/compare";
 import { HOLIDAY_MARKET_KEYS, MARKET_KEYS } from "@/config/exchange-schedule";
 import { PULSE_SLUGS } from "@/lib/pulse";
-import { CURRENCY_CODES, FX_SLUGS } from "@/lib/fx";
+import { CRYPTO_CODES, CURRENCY_CODES, FX_SLUGS, MAJOR, pairSlug } from "@/lib/fx";
 import { DON_PRESETS, donSlug } from "@/lib/gold";
 import { POPULAR_SYMBOLS } from "@/lib/popular";
 import { SITE_URL } from "@/lib/site";
@@ -109,6 +109,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
         changeFrequency: "hourly" as const,
         priority: /^\d/.test(slug) ? 0.6 : 0.8,
       })),
+      // Phase 1 of the crypto leg: top 20 coins x the major fiats, both
+      // directions, pair pages only (no amount fan-out yet — see the commit
+      // that added CryptoPairPage for why). The full space (72 coins x 43
+      // fiats x 2) is ~6,200 pairs; deliberately not released at once.
+      ...CRYPTO_CODES.slice(0, 20).flatMap((coin) =>
+        MAJOR.flatMap((fiat) => [
+          { url: `${SITE_URL}${p}/convert/${pairSlug(coin, fiat)}`, changeFrequency: "hourly" as const, priority: 0.7 },
+          { url: `${SITE_URL}${p}/convert/${pairSlug(fiat, coin)}`, changeFrequency: "hourly" as const, priority: 0.6 },
+        ])
+      ),
     ]),
     // Quote pages exist in English, Korean and Japanese.
     ...["", "/ko", "/ja"].flatMap((p) =>
