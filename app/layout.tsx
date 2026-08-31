@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     title: "PNL404 — Global Markets, One Page",
     description: DESCRIPTION,
   },
-  robots: { index: true, follow: true },
+  robots: { index: true, follow: true, "max-image-preview": "large" },
 };
 
 export const viewport: Viewport = {
