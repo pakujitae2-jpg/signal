@@ -336,6 +336,37 @@ const JA_COPY: Copy = {
 
 export const COPY: Record<Lang, Copy> = { en: EN, ko: KO_COPY, ja: JA_COPY };
 
+// Korean and Japanese group large numbers by 10,000 (만/万), not 1,000, with a
+// second unit at 100,000,000 (억/億) — "1억" reads instantly where "100,000,000"
+// does not. Only clean multiples get the word form; anything irregular falls
+// back to plain grouped digits rather than guessing at a label.
+function manEok(unit: string, bigUnit: string, n: number, tag: string): string {
+  if (!isFinite(n) || n < 10_000) return n.toLocaleString(tag, { maximumFractionDigits: 2 });
+  if (n < 100_000_000) {
+    const man = n / 10_000;
+    return Number.isInteger(man) ? `${man.toLocaleString(tag)}${unit}` : n.toLocaleString(tag);
+  }
+  const eok = Math.floor(n / 100_000_000);
+  const rem = n % 100_000_000;
+  if (rem === 0) return `${eok.toLocaleString(tag)}${bigUnit}`;
+  if (rem % 10_000 === 0) return `${eok.toLocaleString(tag)}${bigUnit} ${(rem / 10_000).toLocaleString(tag)}${unit}`;
+  return n.toLocaleString(tag);
+}
+
+// English has no word below "million" worth using on a currency-amount page.
+function enBigNum(n: number, tag: string): string {
+  if (!isFinite(n) || n < 1_000_000) return n.toLocaleString(tag, { maximumFractionDigits: 2 });
+  return n % 1_000_000 === 0 ? `${(n / 1_000_000).toLocaleString(tag)} million` : n.toLocaleString(tag);
+}
+
+/** "100000000" -> "1억" (ko) / "1億" (ja) / "100 million" (en). Falls back to grouped digits when not a clean multiple. */
+export function bigNumLabel(lang: Lang, n: number): string {
+  const tag = LOCALE_TAG[lang];
+  if (lang === "ko") return manEok("만", "억", n, tag);
+  if (lang === "ja") return manEok("万", "億", n, tag);
+  return enBigNum(n, tag);
+}
+
 /** Number formatter for the locale. */
 export function numFmt(lang: Lang): { rate: Fmt; amount: Fmt; input: Fmt } {
   const tag = LOCALE_TAG[lang];
@@ -350,7 +381,10 @@ export function numFmt(lang: Lang): { rate: Fmt; amount: Fmt; input: Fmt } {
       const digits = Math.abs(v) >= 1000 ? 2 : Math.abs(v) >= 1 ? 4 : 6;
       return v.toLocaleString(tag, { maximumFractionDigits: digits });
     },
-    input: (v) => v.toLocaleString(tag, { maximumFractionDigits: 2 }),
+    // Input amounts are round numbers by construction (a ladder preset or a
+    // typed URL amount), so the CJK 만/억 grouping applies here but not to
+    // `amount`/`rate` above, which render computed results and live rates.
+    input: (v) => bigNumLabel(lang, v),
   };
 }
 

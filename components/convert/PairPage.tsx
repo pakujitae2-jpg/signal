@@ -6,7 +6,7 @@ import FxConverter from "@/components/FxConverter";
 import JsonLd from "@/components/JsonLd";
 import { AFFILIATES, AFFILIATE_DISCLOSURE } from "@/config/affiliates";
 import { fmtTime } from "@/lib/format";
-import { AMOUNTS, CURRENCIES, CURRENCY_CODES, MAJOR, amountSlug, fxSymbol, getFxRate, pairSlug, parseSlug, type FxRate } from "@/lib/fx";
+import { CURRENCIES, CURRENCY_CODES, MAJOR, amountSlug, amountsFor, fxSymbol, getFxRate, pairSlug, parseSlug, type FxRate } from "@/lib/fx";
 import { COPY, LANGS, LANG_LABEL, curCountry, curName, languageAlternates, numFmt, prefix, type Lang } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
 
@@ -257,11 +257,11 @@ export async function PairPage({ lang, slug }: { lang: Lang; slug: string }) {
       <section className="block">
         <div className="kicker"><h2 className="kicker-label">{c.popularAmounts}</h2></div>
         <div className="pair-grid">
-          {AMOUNTS.map((x) => {
+          {amountsFor(base).map((x) => {
             const s = amountSlug(x, base, quote);
             if (s === slug) return null;
             return (
-              <Link className="pair-link" key={s} href={`${p}/convert/${s}`}>{c.amountLink(x.toLocaleString("en-US"), base, quote)}</Link>
+              <Link className="pair-link" key={s} href={`${p}/convert/${s}`}>{c.amountLink(f.input(x), base, quote)}</Link>
             );
           })}
           {amount !== null && <Link className="pair-link" href={`${p}/convert/${pairSlug(base, quote)}`}>{c.rateLink(base, quote)}</Link>}
@@ -291,18 +291,48 @@ export async function PairPage({ lang, slug }: { lang: Lang; slug: string }) {
               </tr>
             </thead>
             <tbody>
-              {AMOUNTS.map((x) => (
-                <tr key={x}>
-                  <td style={{ textAlign: "left" }}>
-                    <Link className="qlink" href={`${p}/convert/${amountSlug(x, base, quote)}`}>{b.symbol}{x.toLocaleString("en-US")}</Link>
-                  </td>
-                  <td>{q.symbol}{f.amount(x * fx.rate)}</td>
-                  <td style={{ textAlign: "left" }}>
-                    <Link className="qlink" href={`${p}/convert/${amountSlug(x, quote, base)}`}>{q.symbol}{x.toLocaleString("en-US")}</Link>
-                  </td>
-                  <td>{b.symbol}{f.amount(x / fx.rate)}</td>
-                </tr>
-              ))}
+              {(() => {
+                // Each side gets the ladder appropriate to ITS OWN currency's
+                // magnitude (e.g. up to 1억 for a KRW column, 10,000 for a USD
+                // one), so the two columns can have different row counts.
+                const baseAmounts = amountsFor(base);
+                const quoteAmounts = amountsFor(quote);
+                const rows = Math.max(baseAmounts.length, quoteAmounts.length);
+                return Array.from({ length: rows }, (_, i) => {
+                  const x = baseAmounts[i];
+                  const y = quoteAmounts[i];
+                  return (
+                    <tr key={i}>
+                      {x !== undefined ? (
+                        <>
+                          <td style={{ textAlign: "left" }}>
+                            <Link className="qlink" href={`${p}/convert/${amountSlug(x, base, quote)}`}>{b.symbol}{f.input(x)}</Link>
+                          </td>
+                          <td>{q.symbol}{f.amount(x * fx.rate)}</td>
+                        </>
+                      ) : (
+                        <>
+                          <td />
+                          <td />
+                        </>
+                      )}
+                      {y !== undefined ? (
+                        <>
+                          <td style={{ textAlign: "left" }}>
+                            <Link className="qlink" href={`${p}/convert/${amountSlug(y, quote, base)}`}>{q.symbol}{f.input(y)}</Link>
+                          </td>
+                          <td>{b.symbol}{f.amount(y / fx.rate)}</td>
+                        </>
+                      ) : (
+                        <>
+                          <td />
+                          <td />
+                        </>
+                      )}
+                    </tr>
+                  );
+                });
+              })()}
             </tbody>
           </table>
         </div>

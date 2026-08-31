@@ -74,6 +74,19 @@ export const MAJOR: string[] = ["USD", "EUR", "JPY", "GBP", "KRW", "CNY", "INR",
 
 export const AMOUNTS: number[] = [1, 5, 10, 20, 50, 100, 500, 1000, 5000, 10000];
 
+// KRW, JPY, VND, IDR, COP and CLP are all quoted in the hundreds or
+// thousands per US dollar, so the reverse ladder in AMOUNTS above never
+// clears about $7 — nobody searches "10,000 won in dollars." These
+// currencies get a high-magnitude ladder instead, up to 1억/1億 (100M), the
+// scale Korean and Japanese searches for these amounts actually use.
+const HIGH_MAGNITUDE: ReadonlySet<string> = new Set(["KRW", "JPY", "VND", "IDR", "COP", "CLP"]);
+export const HIGH_AMOUNTS: number[] = [1000, 10000, 100000, 1000000, 10000000, 100000000];
+
+/** The amount ladder appropriate to a currency's typical magnitude. */
+export function amountsFor(code: string): number[] {
+  return HIGH_MAGNITUDE.has(code) ? HIGH_AMOUNTS : AMOUNTS;
+}
+
 /** Every ordered pair of distinct currencies. */
 export const FX_PAIRS: [string, string][] = CURRENCY_CODES.flatMap((b) =>
   CURRENCY_CODES.filter((q) => q !== b).map((q): [string, string] => [b, q])
@@ -91,7 +104,7 @@ export function amountSlug(amount: number, base: string, quote: string): string 
 export const FX_SLUGS: string[] = [
   ...FX_PAIRS.map(([b, q]) => pairSlug(b, q)),
   ...FX_PAIRS.filter(([b, q]) => MAJOR.includes(b) && MAJOR.includes(q)).flatMap(([b, q]) =>
-    AMOUNTS.map((a) => amountSlug(a, b, q))
+    amountsFor(b).map((a) => amountSlug(a, b, q))
   ),
 ];
 
