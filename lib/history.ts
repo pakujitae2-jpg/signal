@@ -6,7 +6,7 @@ import { fetchJson } from "./http";
 
 import type { HistoryPoint } from "./invested-math";
 
-export { closeAt, computeInvested, type HistoryPoint, type InvestedResult } from "./invested-math";
+export { closeAt, computeInvested, computeDca, type HistoryPoint, type InvestedResult, type DcaResult } from "./invested-math";
 
 export type History = {
   symbol: string;

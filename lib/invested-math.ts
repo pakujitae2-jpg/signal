@@ -68,3 +68,79 @@ export function computeInvested(
     path: points.filter((p) => p.t >= start.t),
   };
 }
+
+export type DcaResult = {
+  startedAt: number;
+  endAt: number;
+  endPrice: number;
+  monthlyAmount: number;
+  months: number;
+  contributed: number;
+  units: number;
+  value: number;
+  profit: number;
+  totalPct: number;
+  avgCost: number;
+  /** Annualized return implied by treating the contributed total as one lump
+   *  sum at its dollar-weighted average age — an approximation, not a true
+   *  money-weighted (XIRR) rate. Null under 6 months of contributions. */
+  annualizedPct: number | null;
+  currency: string;
+  /** Portfolio value at each contribution date, using units held as of that
+   *  date — reflects the ramping position size, unlike a lump-sum rescale. */
+  path: HistoryPoint[];
+  /** Running total contributed as of each point, for charting cost basis
+   *  against value (DCA's basis rises every month, unlike a lump sum's). */
+  contributedPath: HistoryPoint[];
+};
+
+/**
+ * A fixed amount bought on every monthly close from `startMs` to the most
+ * recent bar, using the real monthly closes. Returns null when the symbol
+ * has no usable history or fewer than 2 contributions would result.
+ */
+export function computeDca(
+  points: HistoryPoint[],
+  currency: string,
+  monthlyAmount: number,
+  startMs: number
+): DcaResult | null {
+  if (points.length < 2 || !(monthlyAmount > 0)) return null;
+  const inRange = points.filter((p) => p.t >= startMs);
+  if (inRange.length < 2) return null;
+
+  const end = points[points.length - 1];
+  let units = 0;
+  let contributed = 0;
+  let weightedAge = 0;
+  const path: HistoryPoint[] = [];
+  const contributedPath: HistoryPoint[] = [];
+  for (const p of inRange) {
+    units += monthlyAmount / p.c;
+    contributed += monthlyAmount;
+    weightedAge += monthlyAmount * (end.t - p.t);
+    path.push({ t: p.t, c: units * p.c });
+    contributedPath.push({ t: p.t, c: contributed });
+  }
+
+  const value = units * end.c;
+  const avgAgeYears = weightedAge / contributed / (365.25 * 86400_000);
+
+  return {
+    startedAt: inRange[0].t,
+    endAt: end.t,
+    endPrice: end.c,
+    monthlyAmount,
+    months: inRange.length,
+    contributed,
+    units,
+    value,
+    profit: value - contributed,
+    totalPct: (value / contributed - 1) * 100,
+    avgCost: contributed / units,
+    annualizedPct: avgAgeYears >= 0.5 ? (Math.pow(value / contributed, 1 / avgAgeYears) - 1) * 100 : null,
+    currency,
+    path,
+    contributedPath,
+  };
+}

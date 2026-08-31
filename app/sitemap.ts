@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { COMPARE_SLUGS } from "@/lib/compare";
+import { dcaSitemapSymbols } from "@/lib/dca";
 import { HOLIDAY_MARKET_KEYS, MARKET_KEYS } from "@/config/exchange-schedule";
 import { PULSE_SLUGS } from "@/lib/pulse";
 import { CRYPTO_CODES, CURRENCY_CODES, FX_SLUGS, MAJOR, pairSlug } from "@/lib/fx";
@@ -11,6 +12,12 @@ import { SITE_URL } from "@/lib/site";
 import { byGroup } from "@/lib/universe";
 
 const MARKET_HOLIDAY_YEARS = [2026, 2027];
+
+// Bounded to indices + ETFs + the top of the US list + top 20 crypto (~120
+// symbols): /dca/<symbol> works for any universe symbol on direct request,
+// but each cold crawl hit is a fresh full-history fetch, so the full
+// 550-symbol universe isn't submitted at once — see lib/dca.ts.
+const DCA_SYMBOLS = dcaSitemapSymbols();
 
 // Recent Fear & Greed permalink dates only — the full archive back to 2018
 // resolves and is internally linked (e.g. the all-time high/low on
@@ -41,6 +48,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       { url: `${SITE_URL}${p}/movers`, changeFrequency: "hourly" as const, priority: 0.9 },
       { url: `${SITE_URL}${p}/compare`, changeFrequency: "weekly" as const, priority: 0.8 },
       { url: `${SITE_URL}${p}/tools/invested`, changeFrequency: "weekly" as const, priority: 0.8 },
+      ...DCA_SYMBOLS.map((symbol) => ({
+        url: `${SITE_URL}${p}/dca/${encodeURIComponent(symbol)}`,
+        changeFrequency: "weekly" as const,
+        priority: 0.6,
+      })),
       { url: `${SITE_URL}${p}/tools/gold-calculator`, changeFrequency: "hourly" as const, priority: 0.7 },
       ...DON_PRESETS.map((n) => ({
         url: `${SITE_URL}${p}/tools/gold-calculator/${donSlug(n)}`,

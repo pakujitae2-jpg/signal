@@ -66,6 +66,37 @@ export type InvestedCopy = {
   footer: string;
 };
 
+export type DcaCopy = {
+  /** {NAME} */ title: string;
+  /** {NAME} */ description: string;
+  /** {NAME} */ h1: string;
+  sub: string;
+  formHeading: string;
+  amountLabel: string;
+  startLabel: string;
+  resultHeading: string;
+  /** {N} */ monthsNote: string;
+  contributedLabel: string;
+  valueLabel: string;
+  profitLabel: string;
+  totalPctLabel: string;
+  avgCostLabel: string;
+  annualizedLabel: string;
+  vsLumpHeading: string;
+  /** {LUMP} {DCA} */ vsLumpNote: string;
+  chartHeading: string;
+  tableHeading: string;
+  colHorizon: string;
+  colValue: string;
+  colReturn: string;
+  aboutHeading: string;
+  aboutP1: string;
+  aboutP2: string;
+  unavailable: string;
+  presetHeading: string;
+  footer: string;
+};
+
 export type GoldCopy = {
   title: string;
   description: string;
@@ -149,6 +180,7 @@ export type WidgetCopy = {
 export type FeatureCopy = {
   compare: Record<Lang, CompareCopy>;
   invested: Record<Lang, InvestedCopy>;
+  dca: Record<Lang, DcaCopy>;
   gold: Record<Lang, GoldCopy>;
   movers: Record<Lang, MoversCopy>;
   search: Record<Lang, SearchCopy>;
@@ -157,6 +189,7 @@ export type FeatureCopy = {
 
 export const compareCopy = (lang: Lang): CompareCopy => FEATURE_COPY.compare[lang];
 export const investedCopy = (lang: Lang): InvestedCopy => FEATURE_COPY.invested[lang];
+export const dcaCopy = (lang: Lang): DcaCopy => FEATURE_COPY.dca[lang];
 export const goldCopy = (lang: Lang): GoldCopy => FEATURE_COPY.gold[lang];
 export const moversCopy = (lang: Lang): MoversCopy => FEATURE_COPY.movers[lang];
 export const searchCopy = (lang: Lang): SearchCopy => FEATURE_COPY.search[lang];
