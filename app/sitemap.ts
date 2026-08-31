@@ -4,6 +4,7 @@ import { HOLIDAY_MARKET_KEYS, MARKET_KEYS } from "@/config/exchange-schedule";
 import { PULSE_SLUGS } from "@/lib/pulse";
 import { CRYPTO_CODES, CURRENCY_CODES, FX_SLUGS, MAJOR, pairSlug } from "@/lib/fx";
 import { DIVIDEND_SYMBOLS } from "@/lib/dividends";
+import { coreFxPairs, historyYears } from "@/lib/fx-history";
 import { DON_PRESETS, donSlug } from "@/lib/gold";
 import { POPULAR_SYMBOLS } from "@/lib/popular";
 import { SITE_URL } from "@/lib/site";
@@ -110,6 +111,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
         changeFrequency: "hourly" as const,
         priority: /^\d/.test(slug) ? 0.6 : 0.8,
       })),
+      // Historical FX by year and year-end date, for the 7-currency core
+      // set (42 directional pairs). Year pages get every year on record; a
+      // closed year never changes, but the current year accumulates daily.
+      // Year-end dated pages are gated to PAST years only — this year's
+      // Dec 31 hasn't happened yet, so it isn't a real page to submit.
+      ...coreFxPairs().flatMap(([base, quote]) => {
+        const years = historyYears();
+        const thisYear = new Date().getUTCFullYear();
+        return years.flatMap((y) => [
+          { url: `${SITE_URL}${p}/convert/${pairSlug(base, quote)}/${y}`, changeFrequency: y === thisYear ? ("daily" as const) : ("never" as const), priority: 0.5 },
+          ...(y < thisYear ? [{ url: `${SITE_URL}${p}/convert/${pairSlug(base, quote)}/${y}-12-31`, changeFrequency: "never" as const, priority: 0.4 }] : []),
+        ]);
+      }),
       // Phase 1 of the crypto leg: top 20 coins x the major fiats, both
       // directions, pair pages only (no amount fan-out yet — see the commit
       // that added CryptoPairPage for why). The full space (72 coins x 43

@@ -189,7 +189,10 @@ async function ecbHistory(base: string, quote: string, days: number): Promise<{ 
   const end = new Date();
   const start = new Date(end.getTime() - days * 86400_000);
   const iso = (d: Date) => d.toISOString().slice(0, 10);
-  const json = await fetchJson(`https://api.frankfurter.app/${iso(start)}..${iso(end)}?from=${base}&to=${quote}`, 3600);
+  // frankfurter.app now 301-redirects here; call the real host directly so
+  // every request doesn't pay a redirect hop (and doesn't break outright if
+  // that redirect is ever retired).
+  const json = await fetchJson(`https://api.frankfurter.dev/v1/${iso(start)}..${iso(end)}?from=${base}&to=${quote}`, 3600);
   const rates: Record<string, Record<string, number>> = json?.rates ?? {};
   return Object.keys(rates)
     .sort()
