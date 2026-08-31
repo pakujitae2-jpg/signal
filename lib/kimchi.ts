@@ -1,18 +1,17 @@
 import { fetchJson } from "./http";
+import { fetchSpark } from "./market";
 import { getQuoteDetail } from "./quote";
+import { byGroup } from "./universe";
 
 // Kimchi premium = how much more (or less) a coin costs on Korea's Upbit
 // (in KRW) than on global exchanges, after converting through USD/KRW.
 // premium % = upbitKrw / (globalUsd * usdKrw) - 1
-
-const COINS = [
-  { symbol: "BTC", name: "Bitcoin", geckoId: "bitcoin" },
-  { symbol: "ETH", name: "Ethereum", geckoId: "ethereum" },
-  { symbol: "XRP", name: "XRP", geckoId: "ripple" },
-  { symbol: "SOL", name: "Solana", geckoId: "solana" },
-  { symbol: "DOGE", name: "Dogecoin", geckoId: "dogecoin" },
-  { symbol: "ADA", name: "Cardano", geckoId: "cardano" },
-] as const;
+//
+// Widened from an original 6-coin hardcode to every coin this site already
+// tracks (byGroup("crypto"), ~72 symbols) that Upbit also lists in KRW —
+// reusing the existing Yahoo -USD quotes as the "reliable global reference"
+// rather than a Coinbase-specific symbol list, since Yahoo is already the
+// site's trusted source for the ATH, technicals and DCA features.
 
 export type KimchiRow = {
   symbol: string;
@@ -33,57 +32,23 @@ export type KimchiData = {
 const CACHE_TTL_MS = 15_000;
 let cache: { data: KimchiData; ts: number } | null = null;
 
-async function fetchUpbit(): Promise<Map<string, number>> {
-  const markets = COINS.map((c) => `KRW-${c.symbol}`).join(",");
-  const json = await fetchJson(`https://api.upbit.com/v1/ticker?markets=${markets}`);
+/** Every KRW market's latest trade price, keyed by base symbol (no KRW- prefix). */
+async function fetchUpbitAll(): Promise<Map<string, number>> {
+  const markets = await fetchJson("https://api.upbit.com/v1/market/all?isDetails=true", 3600);
+  const krwMarkets = (markets as unknown[])
+    .filter((m): m is { market: string } => typeof (m as { market?: unknown })?.market === "string" && (m as { market: string }).market.startsWith("KRW-"))
+    .map((m) => m.market);
+  if (krwMarkets.length === 0) throw new Error("upbit market list empty");
+
+  const json = await fetchJson(`https://api.upbit.com/v1/ticker?markets=${krwMarkets.join(",")}`, 15);
   const map = new Map<string, number>();
-  for (const t of json as any[]) {
-    const sym = String(t?.market ?? "").replace(/^KRW-/, "");
-    if (sym && typeof t?.trade_price === "number") map.set(sym, t.trade_price);
+  for (const t of json as unknown[]) {
+    const row = t as { market?: unknown; trade_price?: unknown };
+    const sym = String(row?.market ?? "").replace(/^KRW-/, "");
+    if (sym && typeof row?.trade_price === "number") map.set(sym, row.trade_price);
   }
-  if (map.size === 0) throw new Error("upbit: empty");
+  if (map.size === 0) throw new Error("upbit ticker empty");
   return map;
-}
-
-// Coinbase Exchange gives true USD trades and is reachable from US servers
-// (Binance's API is not); CoinGecko's global average is the fallback.
-async function fetchGlobalUsd(): Promise<Map<string, number>> {
-  const map = new Map<string, number>();
-  try {
-    const results = await Promise.all(
-      COINS.map((c) => fetchJson(`https://api.exchange.coinbase.com/products/${c.symbol}-USD/ticker`))
-    );
-    COINS.forEach((c, i) => {
-      const price = parseFloat(results[i]?.price);
-      if (isFinite(price)) map.set(c.symbol, price);
-    });
-  } catch {
-    const ids = COINS.map((c) => c.geckoId).join(",");
-    const json = await fetchJson(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`);
-    for (const c of COINS) {
-      const price = (json as any)?.[c.geckoId]?.usd;
-      if (typeof price === "number") map.set(c.symbol, price);
-    }
-  }
-  if (map.size === 0) throw new Error("global prices: empty");
-  return map;
-}
-
-const SAMPLE_PREMIUMS: Record<string, number> = { BTC: 2.14, ETH: 1.86, XRP: 3.21, SOL: 1.52, DOGE: 2.77, ADA: 1.93 };
-const SAMPLE_USD: Record<string, number> = { BTC: 64210, ETH: 3412, XRP: 0.512, SOL: 152.3, DOGE: 0.118, ADA: 0.41 };
-
-function sampleData(usdKrw: number): KimchiData {
-  return {
-    updatedAt: new Date().toISOString(),
-    usdKrw,
-    rows: COINS.map((c) => {
-      const globalUsd = SAMPLE_USD[c.symbol];
-      const globalKrw = globalUsd * usdKrw;
-      const premiumPct = SAMPLE_PREMIUMS[c.symbol];
-      return { symbol: c.symbol, name: c.name, upbitKrw: globalKrw * (1 + premiumPct / 100), globalUsd, globalKrw, premiumPct };
-    }),
-    source: "sample",
-  };
 }
 
 export async function getKimchiData(): Promise<KimchiData> {
@@ -93,27 +58,27 @@ export async function getKimchiData(): Promise<KimchiData> {
   const usdKrw = fx?.price ?? 1384.5;
 
   try {
-    const [upbit, global] = await Promise.all([fetchUpbit(), fetchGlobalUsd()]);
+    const upbit = await fetchUpbitAll();
+    const candidates = byGroup("crypto").filter((e) => upbit.has(e.symbol.replace(/-USD$/, "")));
+    if (candidates.length === 0) throw new Error("no overlap between Upbit KRW markets and tracked crypto");
+    const global = await fetchSpark(candidates.map((e) => e.symbol), "1d", "5m", 30);
+
     const rows: KimchiRow[] = [];
-    for (const c of COINS) {
-      const upbitKrw = upbit.get(c.symbol);
-      const globalUsd = global.get(c.symbol);
-      if (upbitKrw === undefined || globalUsd === undefined) continue;
+    for (const e of candidates) {
+      const base = e.symbol.replace(/-USD$/, "");
+      const upbitKrw = upbit.get(base);
+      const globalUsd = global.get(e.symbol)?.last;
+      if (upbitKrw === undefined || !globalUsd) continue;
       const globalKrw = globalUsd * usdKrw;
-      rows.push({
-        symbol: c.symbol,
-        name: c.name,
-        upbitKrw,
-        globalUsd,
-        globalKrw,
-        premiumPct: (upbitKrw / globalKrw - 1) * 100,
-      });
+      rows.push({ symbol: base, name: e.name, upbitKrw, globalUsd, globalKrw, premiumPct: (upbitKrw / globalKrw - 1) * 100 });
     }
     if (rows.length === 0) throw new Error("kimchi: no rows");
     const data: KimchiData = { updatedAt: new Date().toISOString(), usdKrw, rows, source: "live" };
     cache = { data, ts: Date.now() };
     return data;
   } catch {
-    return sampleData(usdKrw);
+    // Never substitute invented premiums — an empty table plus the existing
+    // "sample data" notice is honest; a plausible-looking fake number is not.
+    return { updatedAt: new Date().toISOString(), usdKrw, rows: [], source: "sample" };
   }
 }

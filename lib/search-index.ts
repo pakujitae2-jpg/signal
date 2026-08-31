@@ -5,7 +5,8 @@ import { prefix, curName, type Lang } from "./i18n";
 import { localName } from "./names";
 import { QUOTE_COPY } from "./quote-copy";
 import { symbolSlug } from "./slug";
-import { UNIVERSE } from "./universe";
+import { UNIVERSE, universeEntry } from "./universe";
+import { UPBIT_MARKETS } from "./upbit-markets.generated";
 
 // Catalog shipped to the /search page so typing filters instantly with no
 // round trip. Field names are single letters because the whole list is
@@ -88,6 +89,20 @@ export function buildSearchIndex(lang: Lang): SearchEntry[] {
       k: q.groupLabel[e.group],
       // Both the localized and English names, so "samsung" and "삼성" both hit.
       x: `${e.symbol} ${ticker(e.symbol)} ${symbolSlug(e.symbol)} ${e.name}`.toLowerCase(),
+    });
+  }
+
+  // Upbit-only coins (no Yahoo -USD quote page) — the Korean name IS the
+  // search term for most of this long tail, so it has to resolve to
+  // something even without a dedicated per-coin page yet.
+  const upbitKicker: Record<Lang, string> = { en: "Upbit KRW", ko: "업비트 원화마켓", ja: "Upbitウォン" };
+  for (const m of UPBIT_MARKETS) {
+    if (universeEntry(`${m.symbol}-USD`)) continue;
+    out.push({
+      h: `${p}/markets/upbit-krw`,
+      t: m.koreanName,
+      k: upbitKicker[lang],
+      x: `${m.symbol} ${m.englishName} ${m.koreanName} upbit 업비트`.toLowerCase(),
     });
   }
 

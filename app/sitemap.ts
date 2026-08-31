@@ -136,6 +136,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.9,
       }))
     ),
+    ...["", "/ko", "/ja"].flatMap((p) => [
+      { url: `${SITE_URL}${p}/markets/upbit-krw`, changeFrequency: "hourly" as const, priority: 0.7 },
+      { url: `${SITE_URL}${p}/alerts/upbit-caution`, changeFrequency: "hourly" as const, priority: 0.7 },
+    ]),
     // Currency pages exist in English, Korean and Japanese.
     ...["", "/ko", "/ja"].flatMap((p) => [
       ...(p ? [{ url: `${SITE_URL}${p}/convert`, changeFrequency: "weekly" as const, priority: 0.8 }] : []),
