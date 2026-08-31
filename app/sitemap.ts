@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { COMPARE_SLUGS } from "@/lib/compare";
 import { PULSE_SLUGS } from "@/lib/pulse";
 import { CURRENCY_CODES, FX_SLUGS } from "@/lib/fx";
+import { DON_PRESETS, donSlug } from "@/lib/gold";
 import { POPULAR_SYMBOLS } from "@/lib/popular";
 import { SITE_URL } from "@/lib/site";
 
@@ -19,6 +20,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       { url: `${SITE_URL}${p}/movers`, changeFrequency: "hourly" as const, priority: 0.9 },
       { url: `${SITE_URL}${p}/compare`, changeFrequency: "weekly" as const, priority: 0.8 },
       { url: `${SITE_URL}${p}/tools/invested`, changeFrequency: "weekly" as const, priority: 0.8 },
+      { url: `${SITE_URL}${p}/tools/gold-calculator`, changeFrequency: "hourly" as const, priority: 0.7 },
+      ...DON_PRESETS.map((n) => ({
+        url: `${SITE_URL}${p}/tools/gold-calculator/${donSlug(n)}`,
+        changeFrequency: "hourly" as const,
+        priority: 0.6,
+      })),
       { url: `${SITE_URL}${p}/widget`, changeFrequency: "monthly" as const, priority: 0.6 },
       { url: `${SITE_URL}${p}/pulse`, changeFrequency: "weekly" as const, priority: 0.8 },
       ...PULSE_SLUGS.map((slug) => ({

@@ -66,6 +66,35 @@ export type InvestedCopy = {
   footer: string;
 };
 
+export type GoldCopy = {
+  title: string;
+  description: string;
+  h1: string;
+  sub: string;
+  formHeading: string;
+  gramLabel: string;
+  donLabel: string;
+  karatLabel: string;
+  resultHeading: string;
+  /** {N} */ forWeight: string;
+  perGramLabel: string;
+  perDonLabel: string;
+  basisHeading: string;
+  basisNote: string;
+  presetHeading: string;
+  /** {N} */ presetLink: string;
+  /** {N} */ donPageTitle: string;
+  /** {N} */ donPageDescription: string;
+  aboutHeading: string;
+  aboutP1: string;
+  aboutP2: string;
+  unavailable: string;
+  footer: string;
+};
+
+export const goldDonTitle = (lang: Lang, n: string) => fill(FEATURE_COPY.gold[lang].donPageTitle, { N: n });
+export const goldDonDescription = (lang: Lang, n: string) => fill(FEATURE_COPY.gold[lang].donPageDescription, { N: n });
+
 export type MoversCopy = {
   title: string;
   description: string;
@@ -120,6 +149,7 @@ export type WidgetCopy = {
 export type FeatureCopy = {
   compare: Record<Lang, CompareCopy>;
   invested: Record<Lang, InvestedCopy>;
+  gold: Record<Lang, GoldCopy>;
   movers: Record<Lang, MoversCopy>;
   search: Record<Lang, SearchCopy>;
   widget: Record<Lang, WidgetCopy>;
@@ -127,6 +157,7 @@ export type FeatureCopy = {
 
 export const compareCopy = (lang: Lang): CompareCopy => FEATURE_COPY.compare[lang];
 export const investedCopy = (lang: Lang): InvestedCopy => FEATURE_COPY.invested[lang];
+export const goldCopy = (lang: Lang): GoldCopy => FEATURE_COPY.gold[lang];
 export const moversCopy = (lang: Lang): MoversCopy => FEATURE_COPY.movers[lang];
 export const searchCopy = (lang: Lang): SearchCopy => FEATURE_COPY.search[lang];
 export const widgetCopy = (lang: Lang): WidgetCopy => FEATURE_COPY.widget[lang];
