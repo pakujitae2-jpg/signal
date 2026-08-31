@@ -1,10 +1,13 @@
 import type { MetadataRoute } from "next";
 import { COMPARE_SLUGS } from "@/lib/compare";
+import { HOLIDAY_MARKET_KEYS, MARKET_KEYS } from "@/config/exchange-schedule";
 import { PULSE_SLUGS } from "@/lib/pulse";
 import { CURRENCY_CODES, FX_SLUGS } from "@/lib/fx";
 import { DON_PRESETS, donSlug } from "@/lib/gold";
 import { POPULAR_SYMBOLS } from "@/lib/popular";
 import { SITE_URL } from "@/lib/site";
+
+const MARKET_HOLIDAY_YEARS = [2026, 2027];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
@@ -26,6 +29,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
         changeFrequency: "hourly" as const,
         priority: 0.6,
       })),
+      { url: `${SITE_URL}${p}/market-hours`, changeFrequency: "hourly" as const, priority: 0.8 },
+      { url: `${SITE_URL}${p}/is-the-market-open`, changeFrequency: "hourly" as const, priority: 0.8 },
+      ...MARKET_KEYS.map((m) => ({
+        url: `${SITE_URL}${p}/market-hours/${m}`,
+        changeFrequency: "hourly" as const,
+        priority: 0.7,
+      })),
+      ...HOLIDAY_MARKET_KEYS.flatMap((m) =>
+        MARKET_HOLIDAY_YEARS.map((y) => ({
+          url: `${SITE_URL}${p}/market-holidays/${m}/${y}`,
+          changeFrequency: "weekly" as const,
+          priority: 0.6,
+        }))
+      ),
       { url: `${SITE_URL}${p}/widget`, changeFrequency: "monthly" as const, priority: 0.6 },
       { url: `${SITE_URL}${p}/pulse`, changeFrequency: "weekly" as const, priority: 0.8 },
       ...PULSE_SLUGS.map((slug) => ({
