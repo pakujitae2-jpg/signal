@@ -69,6 +69,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
         changeFrequency: "hourly" as const,
         priority: 0.7,
       })),
+      { url: `${SITE_URL}${p}/tools`, changeFrequency: "weekly" as const, priority: 0.7 },
+      { url: `${SITE_URL}${p}/tools/average`, changeFrequency: "weekly" as const, priority: 0.7 },
+      { url: `${SITE_URL}${p}/tools/compound`, changeFrequency: "weekly" as const, priority: 0.6 },
+      { url: `${SITE_URL}${p}/tools/cagr`, changeFrequency: "weekly" as const, priority: 0.6 },
       { url: `${SITE_URL}${p}/tools/invested`, changeFrequency: "weekly" as const, priority: 0.8 },
       ...DCA_SYMBOLS.map((symbol) => ({
         url: `${SITE_URL}${p}/dca/${encodeURIComponent(symbol)}`,

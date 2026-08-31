@@ -209,6 +209,16 @@ export async function QuotePage({ lang, symbol: raw }: { lang: Lang; symbol: str
               {c.seasonalityLink(name)}
             </Link>
           </p>
+          <p className="statline">
+            <Link className="statline-link" href={`${p}/dca/${encodeURIComponent(symbol)}`}>
+              {c.dcaLink(name)}
+            </Link>
+          </p>
+          <p className="statline">
+            <Link className="statline-link" href={`${p}/tools/average?symbol=${encodeURIComponent(symbol)}`}>
+              {c.averageLink(name)}
+            </Link>
+          </p>
           <Related lang={lang} symbol={symbol} group={group} />
         </>
       ) : (

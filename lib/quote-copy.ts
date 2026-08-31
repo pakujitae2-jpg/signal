@@ -42,6 +42,8 @@ export type QuoteCopy = {
   dividendsLink: (name: string) => string;
   technicalsLink: (name: string) => string;
   seasonalityLink: (name: string) => string;
+  dcaLink: (name: string) => string;
+  averageLink: (name: string) => string;
   unavailable: (sym: string) => string;
   backHome: string;
   footer: string;
@@ -102,6 +104,8 @@ const EN: QuoteCopy = {
   dividendsLink: (name) => `${name} dividend history →`,
   technicalsLink: (name) => `${name} technical indicators →`,
   seasonalityLink: (name) => `${name} seasonality →`,
+  dcaLink: (name) => `${name} DCA calculator →`,
+  averageLink: (name) => `${name} average cost calculator →`,
   unavailable: (sym) => `No data is available for “${sym}” right now. The symbol may be unknown, or the data provider may be unreachable.`,
   backHome: "← Back to the front page",
   footer: "Market data may be delayed and is provided for information only, not investment advice.",
@@ -164,6 +168,8 @@ const KO: QuoteCopy = {
   dividendsLink: (name) => `${name} 배당 이력 →`,
   technicalsLink: (name) => `${name} 기술적 지표 →`,
   seasonalityLink: (name) => `${name} 계절성 →`,
+  dcaLink: (name) => `${name} 적립식 투자 계산기 →`,
+  averageLink: (name) => `${name} 평단가(물타기) 계산기 →`,
   unavailable: (sym) => `“${sym}”의 데이터를 지금 불러올 수 없습니다. 존재하지 않는 종목이거나 데이터 제공처에 일시적으로 접속할 수 없습니다.`,
   backHome: "← 첫 화면으로",
   footer: "시세는 지연될 수 있으며 정보 제공 목적으로만 제공됩니다. 투자 권유가 아닙니다.",
@@ -226,6 +232,8 @@ const JA: QuoteCopy = {
   dividendsLink: (name) => `${name}の配当履歴 →`,
   technicalsLink: (name) => `${name}のテクニカル指標 →`,
   seasonalityLink: (name) => `${name}の季節性 →`,
+  dcaLink: (name) => `${name}の積立シミュレーション →`,
+  averageLink: (name) => `${name}の平均取得単価計算機 →`,
   unavailable: (sym) => `「${sym}」のデータを現在取得できません。銘柄コードが存在しないか、データ提供元に一時的に接続できない可能性があります。`,
   backHome: "← トップページへ",
   footer: "相場情報は遅延する場合があり、情報提供のみを目的としています。投資勧誘ではありません。",
