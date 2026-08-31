@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { COMPARE_SLUGS } from "@/lib/compare";
 import { dcaSitemapSymbols } from "@/lib/dca";
+import { THEME_LISTS } from "@/lib/lists";
 import { HOLIDAY_MARKET_KEYS, MARKET_KEYS } from "@/config/exchange-schedule";
 import { PULSE_SLUGS } from "@/lib/pulse";
 import { CRYPTO_CODES, CURRENCY_CODES, FX_SLUGS, MAJOR, pairSlug } from "@/lib/fx";
@@ -47,6 +48,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       })),
       { url: `${SITE_URL}${p}/movers`, changeFrequency: "hourly" as const, priority: 0.9 },
       { url: `${SITE_URL}${p}/compare`, changeFrequency: "weekly" as const, priority: 0.8 },
+      { url: `${SITE_URL}${p}/list`, changeFrequency: "weekly" as const, priority: 0.8 },
+      ...THEME_LISTS.map((l) => ({
+        url: `${SITE_URL}${p}/list/${l.slug}`,
+        changeFrequency: "hourly" as const,
+        priority: 0.7,
+      })),
       { url: `${SITE_URL}${p}/tools/invested`, changeFrequency: "weekly" as const, priority: 0.8 },
       ...DCA_SYMBOLS.map((symbol) => ({
         url: `${SITE_URL}${p}/dca/${encodeURIComponent(symbol)}`,
