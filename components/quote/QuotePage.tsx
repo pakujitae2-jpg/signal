@@ -199,6 +199,11 @@ export async function QuotePage({ lang, symbol: raw }: { lang: Lang; symbol: str
               </Link>
             </p>
           )}
+          <p className="statline">
+            <Link className="statline-link" href={`${p}/quote/${encodeURIComponent(symbol)}/technicals`}>
+              {c.technicalsLink(name)}
+            </Link>
+          </p>
           <Related lang={lang} symbol={symbol} group={group} />
         </>
       ) : (

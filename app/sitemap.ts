@@ -137,5 +137,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.6,
       }))
     ),
+    // Technical-indicator pages: the screener hub, plus per-symbol pages for
+    // the same curated set already used for /quote itself in this sitemap.
+    ...["", "/ko", "/ja"].flatMap((p) => [
+      { url: `${SITE_URL}${p}/technicals`, changeFrequency: "hourly" as const, priority: 0.7 },
+      ...POPULAR_SYMBOLS.map((symbol) => ({
+        url: `${SITE_URL}${p}/quote/${encodeURIComponent(symbol)}/technicals`,
+        changeFrequency: "daily" as const,
+        priority: 0.6,
+      })),
+    ]),
   ];
 }

@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { DividendsPage, dividendsMetadata } from "@/components/quote/DividendsPage";
+import { ScreenerPage, screenerMetadata } from "@/components/pages/ScreenerPage";
 import { isLang } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
-type Props = { params: Promise<{ lang: string; symbol: string }> };
+type Props = { params: Promise<{ lang: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { lang, symbol } = await params;
+  const { lang } = await params;
   if (!isLang(lang) || lang === "en") return { title: "PNL404" };
-  return dividendsMetadata(lang, decodeURIComponent(symbol));
+  return screenerMetadata(lang);
 }
 
 export default async function Page({ params }: Props) {
-  const { lang, symbol } = await params;
+  const { lang } = await params;
   if (!isLang(lang) || lang === "en") notFound();
-  return DividendsPage({ lang, symbol: decodeURIComponent(symbol) });
+  return ScreenerPage({ lang });
 }
