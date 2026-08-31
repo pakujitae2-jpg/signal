@@ -113,7 +113,14 @@ export const PAGE_COPY: PageCopy = {
       "tradeHeading": "Trade Crypto",
       "partnerOffers": "Partner offers",
       "sampleNote": "Note: sample figures shown — live data connects automatically in production deployments.",
-      "footer": "Market data may be delayed and is provided for information only, not investment advice."
+      "footer": "Market data may be delayed and is provided for information only, not investment advice.",
+      "allTimeHeading": "All-Time Records",
+      "allTimeHigh": "All-Time High",
+      "allTimeLow": "All-Time Low",
+      "dateTitle": "Crypto Fear & Greed Index — {DATE}",
+      "dateDescription": "The Crypto Fear & Greed Index reading for {DATE}, from the full historical archive back to February 2018.",
+      "dateH1": "Fear & Greed Index — {DATE}",
+      "backToToday": "Back to today's reading"
     },
     "ko": {
       "title": "코인 공포탐욕지수 실시간 — 오늘의 시장 심리 점수",
@@ -143,7 +150,14 @@ export const PAGE_COPY: PageCopy = {
       "tradeHeading": "코인 거래하기",
       "partnerOffers": "제휴 혜택",
       "sampleNote": "안내: 예시 수치입니다. 실제 운영 환경에서는 실시간 데이터가 자동으로 연결됩니다.",
-      "footer": "시세 정보는 지연될 수 있으며 참고용으로만 제공됩니다. 투자 자문이 아닙니다."
+      "footer": "시세 정보는 지연될 수 있으며 참고용으로만 제공됩니다. 투자 자문이 아닙니다.",
+      "allTimeHeading": "역대 기록",
+      "allTimeHigh": "역대 최고",
+      "allTimeLow": "역대 최저",
+      "dateTitle": "코인 공포탐욕지수 — {DATE}",
+      "dateDescription": "2018년 2월부터 이어지는 전체 기록 중 {DATE}의 코인 공포탐욕지수 수치입니다.",
+      "dateH1": "공포탐욕지수 — {DATE}",
+      "backToToday": "오늘의 지수 보기"
     },
     "ja": {
       "title": "暗号資産の恐怖・強欲指数｜リアルタイム市場心理",
@@ -173,7 +187,14 @@ export const PAGE_COPY: PageCopy = {
       "tradeHeading": "暗号資産を取引する",
       "partnerOffers": "提携先のサービス",
       "sampleNote": "注：表示はサンプル値です。本番環境ではリアルタイムデータに自動で接続されます。",
-      "footer": "市場データは遅延する場合があり、情報提供のみを目的としています。投資助言ではありません。"
+      "footer": "市場データは遅延する場合があり、情報提供のみを目的としています。投資助言ではありません。",
+      "allTimeHeading": "歴代記録",
+      "allTimeHigh": "歴代最高",
+      "allTimeLow": "歴代最低",
+      "dateTitle": "暗号資産の恐怖・強欲指数 — {DATE}",
+      "dateDescription": "2018年2月から続く全期間のアーカイブから、{DATE}時点の恐怖・強欲指数の数値です。",
+      "dateH1": "恐怖・強欲指数 — {DATE}",
+      "backToToday": "本日の指数を見る"
     }
   },
   "markets-us": {

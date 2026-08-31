@@ -10,6 +10,14 @@ import { byGroup } from "@/lib/universe";
 
 const MARKET_HOLIDAY_YEARS = [2026, 2027];
 
+// Recent Fear & Greed permalink dates only — the full archive back to 2018
+// resolves and is internally linked (e.g. the all-time high/low on
+// /fear-greed), but isn't worth submitting at that scale.
+const FEAR_GREED_DATES: string[] = Array.from({ length: 90 }, (_, i) => {
+  const d = new Date(Date.now() - i * 86400_000);
+  return d.toISOString().slice(0, 10);
+});
+
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     // The front page exists in every locale.
@@ -23,6 +31,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       { url: `${SITE_URL}${p}/fear-greed`, changeFrequency: "daily" as const, priority: 0.9 },
       { url: `${SITE_URL}${p}/bitcoin-dominance`, changeFrequency: "hourly" as const, priority: 0.8 },
       { url: `${SITE_URL}${p}/altcoin-season`, changeFrequency: "hourly" as const, priority: 0.8 },
+      ...FEAR_GREED_DATES.map((d) => ({
+        url: `${SITE_URL}${p}/fear-greed/${d}`,
+        changeFrequency: "never" as const,
+        priority: 0.4,
+      })),
       { url: `${SITE_URL}${p}/movers`, changeFrequency: "hourly" as const, priority: 0.9 },
       { url: `${SITE_URL}${p}/compare`, changeFrequency: "weekly" as const, priority: 0.8 },
       { url: `${SITE_URL}${p}/tools/invested`, changeFrequency: "weekly" as const, priority: 0.8 },

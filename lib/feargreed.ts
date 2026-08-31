@@ -79,3 +79,51 @@ export async function getFearGreed(): Promise<FearGreedData> {
     return sampleData();
   }
 }
+
+// Full archive back to the index's Feb 2018 start — same endpoint as above
+// with limit=0 instead of 90, at no extra upstream cost. Cached far longer
+// since the archive only grows by one point a day. Used for the all-time
+// high/low on the main page and for /fear-greed/[date] permalinks — NEVER
+// falls back to sample data, unlike getFearGreed() above: a permalink for a
+// specific date must 404 rather than render a synthesized reading.
+export type FearGreedArchive = { history: FGPoint[]; allTimeHigh: FGPoint; allTimeLow: FGPoint };
+
+const ARCHIVE_CACHE_TTL_MS = 6 * 3600_000;
+let archiveCache: { data: FearGreedArchive; ts: number } | null = null;
+
+export async function getFearGreedArchive(): Promise<FearGreedArchive | null> {
+  if (archiveCache && Date.now() - archiveCache.ts < ARCHIVE_CACHE_TTL_MS) return archiveCache.data;
+
+  try {
+    const json = await fetchJson("https://api.alternative.me/fng/?limit=0", 3600);
+    const raw: any[] = json?.data ?? [];
+    const history: FGPoint[] = raw
+      .map((d) => ({
+        t: Number(d.timestamp) * 1000,
+        value: Number(d.value),
+        label: String(d.value_classification ?? classify(Number(d.value))),
+      }))
+      .filter((p) => isFinite(p.t) && isFinite(p.value))
+      .sort((a, b) => a.t - b.t);
+    if (history.length === 0) throw new Error("fng archive: empty");
+
+    let hi = history[0];
+    let lo = history[0];
+    for (const p of history) {
+      if (p.value > hi.value) hi = p;
+      if (p.value < lo.value) lo = p;
+    }
+    const data: FearGreedArchive = { history, allTimeHigh: hi, allTimeLow: lo };
+    archiveCache = { data, ts: Date.now() };
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+/** The archived reading for one UTC calendar date ("YYYY-MM-DD"), or null if outside the archive. */
+export async function getFearGreedOnDate(dateStr: string): Promise<FGPoint | null> {
+  const archive = await getFearGreedArchive();
+  if (!archive) return null;
+  return archive.history.find((p) => new Date(p.t).toISOString().slice(0, 10) === dateStr) ?? null;
+}

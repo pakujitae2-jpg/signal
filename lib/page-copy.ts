@@ -62,6 +62,13 @@ export type FearGreedCopy = {
   partnerOffers: string;
   sampleNote: string;
   footer: string;
+  allTimeHeading: string;
+  allTimeHigh: string;
+  allTimeLow: string;
+  /** {DATE} */ dateTitle: string;
+  /** {DATE} */ dateDescription: string;
+  /** {DATE} */ dateH1: string;
+  backToToday: string;
 };
 
 type MarketsCommon = {
