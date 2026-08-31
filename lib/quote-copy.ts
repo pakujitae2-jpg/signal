@@ -39,6 +39,7 @@ export type QuoteCopy = {
   moreHeading: (groupLabel: string) => string;
   hubLink: (hubLabel: string) => string;
   converterLink: (pair: string) => string;
+  dividendsLink: (name: string) => string;
   unavailable: (sym: string) => string;
   backHome: string;
   footer: string;
@@ -96,6 +97,7 @@ const EN: QuoteCopy = {
   moreHeading: (g) => `More ${g}`,
   hubLink: (h) => `${h} →`,
   converterLink: (pair) => `${pair} converter →`,
+  dividendsLink: (name) => `${name} dividend history →`,
   unavailable: (sym) => `No data is available for “${sym}” right now. The symbol may be unknown, or the data provider may be unreachable.`,
   backHome: "← Back to the front page",
   footer: "Market data may be delayed and is provided for information only, not investment advice.",
@@ -155,6 +157,7 @@ const KO: QuoteCopy = {
   moreHeading: (g) => `${g} 더 보기`,
   hubLink: (h) => `${h} →`,
   converterLink: (pair) => `${pair} 환율 계산기 →`,
+  dividendsLink: (name) => `${name} 배당 이력 →`,
   unavailable: (sym) => `“${sym}”의 데이터를 지금 불러올 수 없습니다. 존재하지 않는 종목이거나 데이터 제공처에 일시적으로 접속할 수 없습니다.`,
   backHome: "← 첫 화면으로",
   footer: "시세는 지연될 수 있으며 정보 제공 목적으로만 제공됩니다. 투자 권유가 아닙니다.",
@@ -214,6 +217,7 @@ const JA: QuoteCopy = {
   moreHeading: (g) => `${g}をもっと見る`,
   hubLink: (h) => `${h} →`,
   converterLink: (pair) => `${pair}の為替計算 →`,
+  dividendsLink: (name) => `${name}の配当履歴 →`,
   unavailable: (sym) => `「${sym}」のデータを現在取得できません。銘柄コードが存在しないか、データ提供元に一時的に接続できない可能性があります。`,
   backHome: "← トップページへ",
   footer: "相場情報は遅延する場合があり、情報提供のみを目的としています。投資勧誘ではありません。",

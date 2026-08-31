@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/JsonLd";
 import QuoteView from "@/components/QuoteView";
+import { dividendsFor } from "@/lib/dividends";
 import { fmtNum } from "@/lib/format";
 import { LANGS, LANG_LABEL, languageAlternates, prefix, type Lang } from "@/lib/i18n";
 import { localName } from "@/lib/names";
@@ -188,6 +189,13 @@ export async function QuotePage({ lang, symbol: raw }: { lang: Lang; symbol: str
             <p className="statline">
               <Link className="statline-link" href={`${p}/convert/${entry.name.slice(0, 3).toLowerCase()}-to-${entry.name.slice(4).toLowerCase()}`}>
                 {c.converterLink(name)}
+              </Link>
+            </p>
+          )}
+          {dividendsFor(symbol.toUpperCase()) && (
+            <p className="statline">
+              <Link className="statline-link" href={`${p}/quote/${encodeURIComponent(symbol)}/dividends`}>
+                {c.dividendsLink(name)}
               </Link>
             </p>
           )}

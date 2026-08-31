@@ -3,6 +3,7 @@ import { COMPARE_SLUGS } from "@/lib/compare";
 import { HOLIDAY_MARKET_KEYS, MARKET_KEYS } from "@/config/exchange-schedule";
 import { PULSE_SLUGS } from "@/lib/pulse";
 import { CRYPTO_CODES, CURRENCY_CODES, FX_SLUGS, MAJOR, pairSlug } from "@/lib/fx";
+import { DIVIDEND_SYMBOLS } from "@/lib/dividends";
 import { DON_PRESETS, donSlug } from "@/lib/gold";
 import { POPULAR_SYMBOLS } from "@/lib/popular";
 import { SITE_URL } from "@/lib/site";
@@ -126,6 +127,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
         url: `${SITE_URL}${p}/quote/${encodeURIComponent(symbol)}`,
         changeFrequency: "hourly" as const,
         priority: 0.7,
+      }))
+    ),
+    // Dividend history pages exist only for the symbols that pay one.
+    ...["", "/ko", "/ja"].flatMap((p) =>
+      DIVIDEND_SYMBOLS.map((symbol) => ({
+        url: `${SITE_URL}${p}/quote/${encodeURIComponent(symbol)}/dividends`,
+        changeFrequency: "weekly" as const,
+        priority: 0.6,
       }))
     ),
   ];
